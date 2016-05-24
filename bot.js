@@ -380,7 +380,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                     //setPrizeStatus(game, 1);
                     sendProcceedLottery = false;
                 //});
-                console.tag('SteamBot', 'SendPrize').log('LoadMyInventory error. Reset offers!');
+                console.tag('SteamBot', 'SendPrize').log('LoadMyInventory error. Reset offers! Error: '+err);
                 return;
             }
             var itemsFromMe = [],
