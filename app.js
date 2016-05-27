@@ -31,6 +31,7 @@ var basicAuth = auth.basic({ //basic auth config
 });
 app.use('/logs', auth.connect(basicAuth), scribe.webPanel());
 
+redisClient.subscribe(config.prefix + 'refresh.bot');
 redisClient.subscribe(config.prefix + 'show.winners');
 redisClient.subscribe(config.prefix + 'queue');
 redisClient.subscribe(config.prefix + 'newDeposit');
@@ -42,6 +43,10 @@ redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
         io.sockets.emit(channel, message);
+    }
+    if(channel == config.prefix + 'refresh.bot'){
+        console.log('Refresh from Admin Panel');
+        process.exit(0);
     }
     if(channel == config.prefix + 'show.winners'){
         clearInterval(timer);
