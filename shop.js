@@ -75,8 +75,6 @@ steamClient.on('logOnResponse', function(logonResp) {
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
-                console.log('getSteamAPIKey shop');
-                console.log(APIKey);
                 offers.setup({
                     sessionID: sessionID,
                     webCookie: newCookie,
@@ -190,8 +188,6 @@ function relogin() {
             sessionID: sessionID,
             webCookie: newCookie
         }, function(err, APIKey) {
-            console.log('getSteamAPIKey shop');
-            console.log(APIKey);
             offers.setup({
                 sessionID: sessionID,
                 webCookie: newCookie,
@@ -301,7 +297,6 @@ var addNewItems = function(){
     })
         .then(function(response) {
             var answer = JSON.parse(response.body);
-            console.log(answer);
             if(answer.success){
                 itemsToSaleProcced = false;
             }

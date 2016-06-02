@@ -84,7 +84,7 @@ io.sockets.on('connection', function(socket) {
 
 function updateOnline(){
     io.sockets.emit('online', Object.keys(io.sockets.adapter.rooms).length);
-    console.info('Connected ' + Object.keys(io.sockets.adapter.rooms).length + ' clients');
+   // console.info('Connected ' + Object.keys(io.sockets.adapter.rooms).length + ' clients');
 }
 
 var steamStatus = [],
@@ -105,7 +105,7 @@ function startTimer(){
     clearInterval(timer);
     console.tag('Game').log('Game start.');
     timer = setInterval(function(){
-        console.tag('Game').log('Timer:' + time);
+       // console.tag('Game').log('Timer:' + time);
         io.sockets.emit('timer', time--);
         if((game.status == 1) && (time <= preFinishingTime)){
             if(!preFinish){
@@ -130,7 +130,7 @@ function startNGTimer(winners){
     ngtimer = setInterval(function(){
         bot.delayForNewGame(true);
         if(time <= 10) data.showSlider = false;
-        console.tag('Game').log('NewGame Timer:' + time);
+       // console.tag('Game').log('NewGame Timer:' + time);
         data.time = time--;
         io.sockets.emit('slider', data);
         if(time <= 0){
@@ -250,7 +250,7 @@ function checkSteamInventoryStatus() {
             client.set('steam.inventory.status', steamStatus.IEconItems);
         },function(response){
             console.log('Something wrong [5]');
-            console.log(response.body);
+         //   console.log(response.body);
         });
 }
 setInterval(checkSteamInventoryStatus, 120000);

@@ -38,11 +38,6 @@ function getSHA1(bytes) {
     shasum.end(bytes);
     return shasum.read();
 }
-// if we've saved a server list, use it
-/*if (fs.existsSync('./config/servers')) {
-    //Steam.servers = JSON.parse(fs.readFileSync('./config/servers'));
-}
-*/
 var steamClient = new Steam.SteamClient();
 var steamUser = new Steam.SteamUser(steamClient);
 var steamFriends = new Steam.SteamFriends(steamClient);
@@ -241,8 +236,7 @@ var parseOffer = function(offer, offerJson) {
             //reWebLogOn(function() {
                 console.tag('SteamBot').error('parseOffer error, ReWebLogon');
                 if(countRetries[offerJson.tradeofferid] > 4) {
-                    console.log(err);
-                    console.tag('SteamBot').error('Error to load inventory');
+                    console.tag('SteamBot').error('Error to load inventory: '+err);
                     redisClient.multi([
                         ["lrem", redisChannels.usersQueue, 0, offer.steamid_other],
                         ['lrem', redisChannels.checkItemsList, 0, offerJson]
