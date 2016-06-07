@@ -31,7 +31,7 @@ try {
         logOnOptions.auth_code = authCode;
     }
 }
-console.log('Код рулетка:', logOnOptions.two_factor_code);
+console.tag('info').info('Код рулетка:', logOnOptions.two_factor_code);
 function getSHA1(bytes) {
     var shasum = crypto.createHash('sha1');
     shasum.end(bytes);
