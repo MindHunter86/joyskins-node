@@ -7,8 +7,9 @@ var config = {
     prefix: '',
 	//настройка бота рулетки
     bot: {
-        username: '',
-        password: ''
+        username: 'aselleyarourse',
+        password: 'AUSvGghJbfyuMJ',
+        sharedSecret: 'hFCjzhgtmN4Rdn/lc3Pf7Ag+tCc='
     },
 	//настройки бота магазина
     shopBot: {
@@ -17,7 +18,7 @@ var config = {
         timeForCancelOffer: 1800
     },
     apiKey: '89638B050C0254D97337012787F57F68',	//steam api key
-    domain: 'joyskins.top',	//домен сайта
+    domain: 'test.joyskins.top',	//домен сайта
     secretKey: '',
     
     admins: [	//steam id админов
