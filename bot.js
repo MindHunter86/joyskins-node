@@ -26,6 +26,7 @@ var logOnOptions = {
 var authCode = ''; // code received by email
 
 console.log(SteamTotp.getAuthCode(config.bot.sharedSecret));
+process.exit(0);
 
 try {
     logOnOptions.two_factor_code = SteamTotp.getAuthCode('BD0KsfI7CbVOPIi4Zo7crK/oFN0=');
