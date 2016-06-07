@@ -9,7 +9,6 @@ var SteamTradeOffers = require('steam-tradeoffers');
 var SteamTotp = require('steam-totp');
 var SteamCommunity = require('steamcommunity');
 var confirmations = new SteamCommunity();
-console.log('жопа')
 var domain = require('domain');
 var redisClient, io, requestify;
 module.exports.init = function(redis, ioSocket, requestifyCore) {
