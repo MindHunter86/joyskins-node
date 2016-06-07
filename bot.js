@@ -24,11 +24,8 @@ var logOnOptions = {
 
 var authCode = ''; // code received by email
 
-console.log(SteamTotp.getAuthCode(config.bot.sharedSecret));
-process.exit(0);
-
 try {
-    logOnOptions.two_factor_code = SteamTotp.getAuthCode('BD0KsfI7CbVOPIi4Zo7crK/oFN0=');
+    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.bot.sharedSecret);
 } catch (e) {
     if (authCode !== '') {
         logOnOptions.auth_code = authCode;
@@ -45,7 +42,7 @@ var steamUser = new Steam.SteamUser(steamClient);
 var steamFriends = new Steam.SteamFriends(steamClient);
 var steamWebLogOn = new SteamWebLogOn(steamClient, steamUser);
 var offers = new SteamTradeOffers();
-
+process.exit(0);
 var checkingOffers = [],
     WebSession = false,
     countRetries = [],
