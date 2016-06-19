@@ -18,7 +18,7 @@ var config = {
         timeForCancelOffer: 1800
     },
     apiKey: '89638B050C0254D97337012787F57F68',	//steam api key
-    domain: 'test.joyskins.top',	//домен сайта
+    domain: 'joyskins.top',	//домен сайта
     secretKey: '',
     
     admins: [	//steam id админов
