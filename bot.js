@@ -412,7 +412,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                             });
                             return;
                         }
-                        console.tag('SteamBot', 'SendPrize').error('Error to send offer.' + err);
+                        console.tag('SteamBot', 'SendPrize').error('Error to send offer.'+game+':'+ err);
 
                         //setPrizeStatus(game, 1);
                         sendProcceedLottery = false;
@@ -501,7 +501,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                 }, function (err, response) {
                     if (err) {
                         console.log(err);
-                        if((err.toString().indexOf('(50)') != -1)  ||(err.toString().indexOf('(15)') != -1) || (err.toString().indexOf('available') != -1)) {
+                        if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('(20)') != -1)  ||(err.toString().indexOf('(15)') != -1) || (err.toString().indexOf('available') != -1)) {
                             console.log('true');
                             redisClient.lrem(redisChannels.sendOffersList, 0, offerJson, function(err, data){
                                 setPrizeStatus(game, 2);
@@ -515,8 +515,8 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                         return;
                     }
                     checkArrGlobal = checkArrGlobal.concat(checkArr);
-                    console.log(checkArrGlobal);
-                    console.log(checkArr);
+                    console.log('checkArrGlobal:',checkArrGlobal);
+                    console.log('checkArr:',checkArr);
                     redisClient.lrem(redisChannels.sendOffersList, 0, offerJson, function(err, data){
                         setPrizeStatus(game, 1);
                         sendProcceed = false;
@@ -590,8 +590,8 @@ var checkedOffersProcceed = function(offerJson){
                         });
 
                 } else {
-                    console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid)
-                            .tag('SteamBot').log(err);           
+                    console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid);
+                    console.tag('SteamBot').log(err);
                     offers.getOffer({tradeOfferId: offer.offerid}, function (err, body){
                         if(err) {
                             checkedProcceed = false;
