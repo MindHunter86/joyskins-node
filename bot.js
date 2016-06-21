@@ -9,7 +9,6 @@ var SteamTradeOffers = require('steam-tradeoffers');
 var SteamTotp = require('steam-totp');
 var SteamCommunity = require('steamcommunity');
 var confirmations = new SteamCommunity();
-console.log('жопа')
 var domain = require('domain');
 var redisClient, io, requestify;
 module.exports.init = function(redis, ioSocket, requestifyCore) {
@@ -32,7 +31,7 @@ try {
         logOnOptions.auth_code = authCode;
     }
 }
-console.log('Код рулетка:', logOnOptions.two_factor_code);
+console.tag('info').info('Код рулетка:', logOnOptions.two_factor_code);
 function getSHA1(bytes) {
     var shasum = crypto.createHash('sha1');
     shasum.end(bytes);
@@ -413,7 +412,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                             });
                             return;
                         }
-                        console.tag('SteamBot', 'SendPrize').error('Error to send offer.' + err);
+                        console.tag('SteamBot', 'SendPrize').error('Error to send offer.'+game+':'+ err);
 
                         //setPrizeStatus(game, 1);
                         sendProcceedLottery = false;
@@ -502,7 +501,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                 }, function (err, response) {
                     if (err) {
                         console.log(err);
-                        if((err.toString().indexOf('(50)') != -1)  ||(err.toString().indexOf('(15)') != -1) || (err.toString().indexOf('available') != -1)) {
+                        if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('(20)') != -1)  ||(err.toString().indexOf('(15)') != -1) || (err.toString().indexOf('available') != -1)) {
                             console.log('true');
                             redisClient.lrem(redisChannels.sendOffersList, 0, offerJson, function(err, data){
                                 setPrizeStatus(game, 2);
@@ -516,8 +515,8 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                         return;
                     }
                     checkArrGlobal = checkArrGlobal.concat(checkArr);
-                    console.log(checkArrGlobal);
-                    console.log(checkArr);
+                    console.log('checkArrGlobal:',checkArrGlobal);
+                    console.log('checkArr:',checkArr);
                     redisClient.lrem(redisChannels.sendOffersList, 0, offerJson, function(err, data){
                         setPrizeStatus(game, 1);
                         sendProcceed = false;
@@ -591,8 +590,8 @@ var checkedOffersProcceed = function(offerJson){
                         });
 
                 } else {
-                    console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid)
-                            .tag('SteamBot').log(err);           
+                    console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid);
+                    console.tag('SteamBot').log(err);
                     offers.getOffer({tradeOfferId: offer.offerid}, function (err, body){
                         if(err) {
                             checkedProcceed = false;
