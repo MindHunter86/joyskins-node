@@ -13,7 +13,7 @@ var domain = require('domain');
 var redisClient, io, requestify;
 module.exports.init = function(redis, ioSocket, requestifyCore) {
     io = ioSocket;
-    redisClient = redis.createClient();
+    redisClient = redis.createClient('6380','167.114.225.101');
     requestify = requestifyCore;
 }
 
