@@ -9,12 +9,15 @@ var config = {
     bot: {
         username: 'aselleyarourse',
         password: 'AUSvGghJbfyuMJ',
-        sharedSecret: 'hFCjzhgtmN4Rdn/lc3Pf7Ag+tCc='
+        sharedSecret: 'BD0KsfI7CbVOPIi4Zo7crK/oFN0=',
+        identitySecret: 'qkiz6mE/i6ZZnXNS8lc0zkMdD5E='
     },
 	//настройки бота магазина
     shopBot: {
         username: '',
         password: '',//
+        sharedSecret: '8z3EuTV1OuF13AyDVmQCpyLcz+I=',
+        identitySecret: 'Gz+2GzTeEzK3kRDTltiycctlVAE=',
         timeForCancelOffer: 1800
     },
     apiKey: '89638B050C0254D97337012787F57F68',	//steam api key

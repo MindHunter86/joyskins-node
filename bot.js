@@ -25,7 +25,7 @@ var logOnOptions = {
 var authCode = ''; // code received by email
 
 try {
-    logOnOptions.two_factor_code = SteamTotp.getAuthCode('BD0KsfI7CbVOPIi4Zo7crK/oFN0=');
+    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.bot.sharedSecret);
 } catch (e) {
     if (authCode !== '') {
         logOnOptions.auth_code = authCode;
@@ -58,7 +58,8 @@ const redisChannels = {
     sendOffersListLottery: config.prefix + 'send.offers.list.lottery',
     tradeoffersList: config.prefix + 'tradeoffers.list',
     declineList:    config.prefix + 'decline.list',
-    usersQueue:     config.prefix + 'usersQueue.list'
+    usersQueue:     config.prefix + 'usersQueue.list',
+    sendAllItemsToAdmin: config.prefix + 'sendAdmin.items'
 }
 
 function steamBotLogger(log){
@@ -102,7 +103,7 @@ steamClient.on('logOnResponse', function(logonResp) {
                 redisClient.del(redisChannels.usersQueue);
                 redisClient.del(redisChannels.sendOffersListLottery);
                 confirmations.setCookies(newCookie);
-                confirmations.startConfirmationChecker(10000, 'qkiz6mE/i6ZZnXNS8lc0zkMdD5E=');
+                confirmations.startConfirmationChecker(10000, config.bot.identitySecret);
                 steamBotLogger('Setup Offers!');
             });
         });
