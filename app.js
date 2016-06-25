@@ -11,8 +11,8 @@ var auth = require('http-auth'),
     bot     = require('./bot.js');
    // shop     = require('./shop.js');
 
-var redisClient = redis.createClient(),
-    client = redis.createClient();
+var redisClient = redis.createClient("6379","51.254.222.131"),
+    client = redis.createClient("6379","51.254.222.131");
 
 bot.init(redis, io, requestify);
 //shop.init(redis, requestify);
