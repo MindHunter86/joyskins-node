@@ -136,7 +136,7 @@ function startNGTimer(winners){
     }, 1000);
 }
 function getCurrentGame(){
-    requestify.post('https://'+config.domain+'/api/getCurrentGame', {
+    requestify.post(config.domain+'/api/getCurrentGame', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -151,7 +151,7 @@ function getCurrentGame(){
         });
 }
 function newLottery(){
-    requestify.post('https://'+config.domain+'/api/newLottery', {
+    requestify.post(config.domain+'/api/newLottery', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -166,7 +166,7 @@ function newLottery(){
         });
 }
 function newGame(){
-    requestify.post('https://'+config.domain+'/api/newGame', {
+    requestify.post(config.domain+'/api/newGame', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -175,7 +175,7 @@ function newGame(){
             io.sockets.emit('newGame', game);
             bot.handleOffers();
             preFinish = false;
-            requestify.post('https://'+config.domain+'/api/bonusBet', {
+            requestify.post(config.domain+'/api/bonusBet', {
                 secretKey: config.secretKey
             })
             .then(function(response) {
@@ -191,7 +191,7 @@ function newGame(){
 }
 
 function showSliderWinnersLottery(){
-    requestify.post('https://'+config.domain+'/api/getWinnersLottery', {
+    requestify.post(config.domain+'/api/getWinnersLottery', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -206,7 +206,7 @@ function showSliderWinnersLottery(){
         });
 }
 function showSliderWinners(){
-    requestify.post('https://'+config.domain+'/api/getWinners', {
+    requestify.post(config.domain+'/api/getWinners', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -222,7 +222,7 @@ function showSliderWinners(){
 }
 
 function setGameStatus(status){
-    requestify.post('https://'+config.domain+'/api/setGameStatus', {
+    requestify.post(config.domain+'/api/setGameStatus', {
         status: status,
         secretKey: config.secretKey
     })
