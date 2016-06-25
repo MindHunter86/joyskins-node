@@ -1,9 +1,4 @@
 var fs = require('fs');
-/*var https_options = {
-    //ca: fs.readFileSync("/var/projects/itemup.ru/crts/ca-bundle.pem"),
-    key: fs.readFileSync("/var/projects/itemup.ru/crts/www.itemupru.key"),
-    cert: fs.readFileSync("/var/projects/itemup.ru/crts/www.itemupru.pem")
-};*/
 var auth = require('http-auth'),
     scribe = require('scribe-js')(),
     console = process.console,
@@ -16,8 +11,8 @@ var auth = require('http-auth'),
     bot     = require('./bot.js'),
     shop     = require('./shop.js');
 
-var redisClient = redis.createClient('6380','167.114.225.101'),
-    client = redis.createClient('6380','167.114.225.101');
+var redisClient = redis.createClient(),
+    client = redis.createClient();
 
 bot.init(redis, io, requestify);
 //shop.init(redis, requestify);
