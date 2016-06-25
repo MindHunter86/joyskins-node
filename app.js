@@ -16,7 +16,7 @@ var redisClient = redis.createClient("6379","51.254.222.131"),
 
 bot.init(redis, io, requestify);
 //shop.init(redis, requestify);
-server.listen(8080, '127.0.0.1');
+server.listen(5000, '127.0.0.1');
 
 console.log('Server started on ' + config.domain + ':5000');
 
