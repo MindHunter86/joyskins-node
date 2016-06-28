@@ -22,7 +22,7 @@ var config = {
     },
     apiKey: '89638B050C0254D97337012787F57F68',	//steam api key
     domain: 'http://164.132.47.168',	//домен сайта
-    secretKey: 'oDWx4GYTr4Acbdms',
+    secretKey: 'GDDrHk76e2n8kwcYtLrbht9ETg2yGC3L',
     
     admins: [	//steam id админов
         '76561198175079859','76561198039687585'//
