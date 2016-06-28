@@ -11,14 +11,14 @@ var auth = require('http-auth'),
     bot     = require('./bot.js');
    // shop     = require('./shop.js');
 
-var redisClient = redis.createClient("6379","51.254.222.131"),
-    client = redis.createClient("6379","51.254.222.131");
+var redisClient = redis.createClient(),
+    client = redis.createClient();
 
 bot.init(redis, io, requestify);
 //shop.init(redis, requestify);
-server.listen(5000, '127.0.0.1');
+server.listen(8080, '127.0.0.1');
 
-console.log('Server started on ' + config.domain + ':5000');
+console.log('Server started on ' + config.domain + ':8080');
 
 var basicAuth = auth.basic({ //basic auth config
     realm: "WebPanel",
