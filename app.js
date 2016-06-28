@@ -140,6 +140,7 @@ function getCurrentGame(){
         secretKey: config.secretKey
     })
         .then(function(response) {
+            console.log(response.body);
             game = JSON.parse(response.body);
             console.tag('Game').log('Current Game #' + game.id);
             if(game.status == 1) startTimer();
