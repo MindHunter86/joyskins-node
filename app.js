@@ -71,7 +71,7 @@ redisClient.on("message", function(channel, message) {
 io.sockets.on('connection', function(socket) {
 
     updateOnline();
-
+    console.log('onConnection');
     socket.on('disconnect', function(){
         updateOnline();
     })
