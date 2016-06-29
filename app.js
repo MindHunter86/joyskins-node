@@ -16,7 +16,7 @@ var redisClient = redis.createClient(),
 
 bot.init(redis, io, requestify);
 //shop.init(redis, requestify);
-server.listen(3000);
+server.listen(8080);
 
 console.log('Server started on ' + config.domain + ':8080');
 
@@ -71,7 +71,6 @@ redisClient.on("message", function(channel, message) {
 io.sockets.on('connection', function(socket) {
 
     updateOnline();
-    console.log('onConnection');
     socket.on('disconnect', function(){
         updateOnline();
     })
