@@ -13,7 +13,7 @@ var domain = require('domain');
 var redisClient, io, requestify;
 module.exports.init = function(redis, ioSocket, requestifyCore) {
     io = ioSocket;
-    redisClient = redis.createClient("6379","51.254.222.131");
+    redisClient = redis.createClient();
     requestify = requestifyCore;
 }
 
@@ -698,6 +698,78 @@ var queueProceed = function() {
             checkNewBet();
         }
     });
+    redisClient.llen(redisChannels.sendAllItemsToAdmin,function(err, length){
+        if(length > 0 && !comissionProcceed && WebSession) {
+            console.tag('SteamBot','Comission').info('Admin comission send list: '+ length);
+            comissionProcceed = true;
+            redisClient.lindex(redisChannels.sendAllItemsToAdmin,0,function(err, comissionJson){
+                offer = JSON.parse(comissionJson);
+                offers.loadMyInventory({
+                    appId: 730,
+                    contextId: 2
+                }, function (err, items) {
+                    if(err) {
+                        comissionProcceed = false;
+                        console.tag('SteamBot', 'Comission').log('LoadMyInventory error. Reset offers! Error: '+err);
+                        return;
+                    }
+                    var itemsFromMe = [],
+                        num = 0;
+                    console.log(offer.items);
+                    for (var j = 0; j < items.length; j++) {
+                        if(items[j].tradable){
+                            for(var i = 0; i < offer.items.length; i++)
+                                if (items[j].classid == offer.items[i].classid) {
+                                    items[j].ss = 1;
+                                    break;
+                                }
+                            if(!items[j].ss) {
+                                itemsFromMe[num++] = {
+                                    appid: 730,
+                                    contextid: 2,
+                                    amount: items[j].amount,
+                                    assetid: items[j].id
+                                };
+                            }
+                        }
+                    }
+                    if (num > 0) {
+                        var message = 'Admin comission Joyskins.top';
+                        offers.makeOffer({
+                            partnerAccountId: offer.partner,
+                            accessToken: offer.accessToken,
+                            itemsFromMe: itemsFromMe,
+                            itemsFromThem: [],
+                            message: message
+                        }, function (err, response) {
+                            if (err) {
+                                console.log(err);
+                                if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('available') != -1) || (err.toString().indexOf('(15)') != -1)) {
+                                    console.log('true');
+                                    redisClient.lrem(redisChannels.sendAllItemsToAdmin, 0, comissionJson, function(err, data){
+                                        comissionProcceed = false;
+                                    });
+                                    return;
+                                }
+                                console.tag('SteamBot', 'Comission').error('Error to send offer.'+ err);;
+                                comissionProcceed = false;
+                                return;
+                            }
+                            redisClient.lrem(redisChannels.sendAllItemsToAdmin, 0, comissionJson, function(err, data){
+                                comissionProcceed = false;
+                            });
+                            console.tag('SteamBot', 'Comission').log('TradeOffer #' + response.tradeofferid +' send!');
+                        });
+                    }else{
+                        console.tag('SteamBot', 'Comission').log('No comission!');
+                        redisClient.lrem(redisChannels.sendAllItemsToAdmin, 0, comissionJson, function(err, data){
+                            comissionProcceed = false;
+                        });
+                    }
+                });
+            });
+        }
+    });
     redisClient.llen(redisChannels.sendOffersList, function(err, length) {
         if (length > 0 && !sendProcceed && WebSession) {
             console.tag('SteamBot','Queues').info('Send winner offers:' + length);
@@ -735,6 +807,7 @@ var checkProcceed = false;
 var checkedProcceed = false;
 var declineProcceed = false;
 var betsProcceed = false;
+var comissionProcceed = false;
 var sendProcceed = false;
 var sendProcceedLottery = false;
 var delayForNewGame = false;
