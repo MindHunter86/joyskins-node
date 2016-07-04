@@ -406,7 +406,7 @@ var queueProceed = function(){
     });
     //Отправка предметов на вход в игру.
     redisClient.llen(redisChannels.receiveBetItems, function(err, length) {
-        if (length > 0 && !checkOfferProcceed && WebSession) {
+        if (length > 0 && !receiveProcceed && WebSession) {
             console.tag('SteamBotDuel','Receive').info('receiveItemsList:' + length);
             receiveProcceed = true;
             redisClient.lindex(redisChannels.receiveBetItems, 0,function (err, offerJson) {
