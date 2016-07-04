@@ -64,8 +64,6 @@ steamClient.on('connected', function() {
 });
 
 steamClient.on('logOnResponse', function(logonResp) {
-    console.log(logonResp);
-    console.log(logonResp.eresult,':',Steam.EResult.OK);
     if (logonResp.eresult === Steam.EResult.OK) {
         steamBotLogger('Logged in!');
         steamFriends.setPersonaState(Steam.EPersonaState.Online);
