@@ -86,14 +86,6 @@ steamClient.on('logOnResponse', function(logonResp) {
                 console.log(APIKey);
                 WebSession = true;
                 globalSession = sessionID;
-                redisClient.lrange(redisChannels.tradeoffersList, 0, -1, function(err, offers){
-                    offers.forEach(function(offer) {
-                        checkingOffers.push(offer);
-                    });
-                    handleOffers();
-                });
-                redisClient.del(redisChannels.usersQueue);
-                redisClient.del(redisChannels.sendOffersListLottery);
                 confirmations.setCookies(newCookie);
                 confirmations.startConfirmationChecker(10000, config.duelsBot.identitySecret);
                 steamBotLogger('Setup Offers!');
