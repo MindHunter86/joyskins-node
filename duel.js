@@ -395,7 +395,7 @@ var is_checkingOfferExists = function(tradeofferid){
 var queueProceed = function(){
     //Выдача выигрыша
     redisClient.llen(redisChannels.sendWinnerPrizeList, function(err, length) {
-        if (length > 0 && !sendWinnerProcceed) {
+        if (length > 0 && !sendWinnerProcceed && WebSession) {
             console.tag('SteamBotDuel','SendWinnerProcceed').info('SendWinnerList:' + length);
             sendWinnerProcceed = true;
             redisClient.lindex(redisChannels.sendWinnerPrizeList, 0,function (err, offerJson) {
@@ -405,7 +405,7 @@ var queueProceed = function(){
     });
     //Отправка предметов на вход в игру.
     redisClient.llen(redisChannels.receiveBetItems, function(err, length) {
-        if (length > 0 && !receiveProcceed) {
+        if (length > 0 && !receiveProcceed && WebSession) {
             console.tag('SteamBotDuel','Receive').info('receiveItemsList:' + length);
             receiveProcceed = true;
             redisClient.lindex(redisChannels.receiveBetItems, 0,function (err, offerJson) {
