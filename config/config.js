@@ -20,6 +20,13 @@ var config = {
         identitySecret: 'Gz+2GzTeEzK3kRDTltiycctlVAE=',
         timeForCancelOffer: 1800
     },
+    //настройки дуэль бота
+    duelsBot:{
+        username: 'aselleyarourse',
+        password: 'AUSvGghJbfyuMJ',
+        sharedSecret: 'BD0KsfI7CbVOPIi4Zo7crK/oFN0=',
+        identitySecret: 'qkiz6mE/i6ZZnXNS8lc0zkMdD5E='
+    },
     apiKey: '89638B050C0254D97337012787F57F68',	//steam api key
     domain: 'http://164.132.47.168',	//домен сайта
     secretKey: 'GDDrHk76e2n8kwcYtLrbht9ETg2yGC3L',

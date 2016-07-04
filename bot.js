@@ -139,7 +139,7 @@ function addQueue(steamid, count) {
     counts = 0;
     responses = [];
     var send = function() { 
-        requestify.post('https://'+config.domain+'/api/userqueue', {
+        requestify.post(config.domain+'/api/userqueue', {
             secretKey: config.secretKey,
             action: 'queueUser',
             id: steamid[counts]
@@ -314,7 +314,7 @@ var parseOffer = function(offer, offerJson) {
 }
 
 var checkOfferPrice = function(){
-    requestify.post('https://'+config.domain+'/api/checkOffer', {
+    requestify.post(config.domain+'/api/checkOffer', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -331,7 +331,7 @@ var checkOfferPrice = function(){
 }
 
 var checkNewBet = function(){
-    requestify.post('https://'+config.domain+'/api/newBet', {
+    requestify.post(config.domain+'/api/newBet', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -540,7 +540,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
 };
 
 var setPrizeStatus = function(game, status){
-    requestify.post('https://'+config.domain+'/api/setPrizeStatus', {
+    requestify.post(config.domain+'/api/setPrizeStatus', {
         secretKey: config.secretKey,
         game: game,
         status: status

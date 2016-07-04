@@ -281,7 +281,7 @@ var sendTradeOffer = function(offerJson){
 
 
 var setItemStatus = function(item, status){
-    requestify.post('https://'+config.domain+'/api/shop/setItemStatus', {
+    requestify.post(config.domain+'/api/shop/setItemStatus', {
         secretKey: config.secretKey,
         id: item,
         status: status
@@ -294,7 +294,7 @@ var setItemStatus = function(item, status){
 }
 
 var addNewItems = function(){
-    requestify.post('https://'+config.domain+'/api/shop/newItems', {
+    requestify.post(config.domain+'/api/shop/newItems', {
         secretKey: config.secretKey
     })
         .then(function(response) {

@@ -33,7 +33,6 @@ redisClient.subscribe(config.prefix + 'newDeposit');
 redisClient.subscribe(config.prefix + 'newPlayer');
 redisClient.subscribe(config.prefix + 'depositDecline');
 redisClient.subscribe(config.prefix + 'show.lottery.winners');
-
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
