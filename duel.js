@@ -307,7 +307,7 @@ var sendTradeOffer = function(offerJson){
         receiveProcceed = false;
     });
     var offer = JSON.parse(offerJson);
-    d.run(function () {
+    console.log(offer);
         offers.loadPartnerInventory({
             partnerSteamId: offer.partnerSteamId,
             contextId: 2,
@@ -378,7 +378,6 @@ var sendTradeOffer = function(offerJson){
                 }
         });
 
-    });
 };
 
 
