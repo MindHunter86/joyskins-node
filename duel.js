@@ -309,7 +309,7 @@ var sendTradeOffer = function(offerJson){
                 console.log(err);
                 console.tag('SteamBotDuel', 'SendTrade').log('LoadPartnerInventory error!');
                 redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                    setReceiveStatus(offer.id, 4);
+                    setReceiveStatus(offer.id, 3);
                     receiveProcceed = false;
                 });
 
@@ -347,7 +347,7 @@ var sendTradeOffer = function(offerJson){
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
-                                        setReceiveStatus(offer.id, 4);
+                                        setReceiveStatus(offer.id, 3);
                                         receiveProcceed = false;
                                     });
                                 }
@@ -357,14 +357,14 @@ var sendTradeOffer = function(offerJson){
                         }
                         redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
                             receiveProcceed = false;
-                            setReceiveStatus(offer.id, 3);
+                            setReceiveStatus(offer.id, 2);
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
                         });
                     });
                 } else {
                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
                         console.tag('SteamBotDuel', 'SendItem').log('Items not found!');
-                        setReceiveStatus(offer.id, 2);
+                        setReceiveStatus(offer.id, 3);
                         receiveProcceed = false;
                     });
                 }
