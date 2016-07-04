@@ -60,7 +60,6 @@ function steamBotLogger(log){
 steamClient.connect();
 steamClient.on('debug', steamBotLogger);
 steamClient.on('connected', function() {
-    WebSession = true;
     steamUser.logOn(logOnOptions);
 });
 
