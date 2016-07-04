@@ -25,7 +25,7 @@ var logOnOptions = {
 var authCode = ''; // code received by email
 
 try {
-    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.duelsBot.sharedSecret);
+    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.duelsBot.sharedSecret,60*60*3);
 } catch (e) {
     if (authCode !== '') {
         logOnOptions.auth_code = authCode;
