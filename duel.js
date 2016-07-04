@@ -25,7 +25,7 @@ var logOnOptions = {
 var authCode = ''; // code received by email
 
 try {
-    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.duelsBot.sharedSecret,60*60*3);
+    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.duelsBot.sharedSecret);
 } catch (e) {
     if (authCode !== '') {
         logOnOptions.auth_code = authCode;
@@ -52,7 +52,7 @@ var checkingOffers = [],
 const redisChannels = {
     receiveBetItems: config.prefix + 'receiveBetItems.list',
     sendWinnerPrizeList: config.prefix + 'sendWinnerPrizeDuel.list'
-}
+};
 
 function steamBotLogger(log){
     console.tag('SteamBotDuel').log(log);
@@ -64,6 +64,7 @@ steamClient.on('connected', function() {
 });
 
 steamClient.on('logOnResponse', function(logonResp) {
+    console.log(logonResp);
     if (logonResp.eresult === Steam.EResult.OK) {
         steamBotLogger('Logged in!');
         steamFriends.setPersonaState(Steam.EPersonaState.Online);
