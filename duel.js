@@ -373,7 +373,8 @@ var sendTradeOffer = function(offerJson){
                             receiveProcceed = false;
                             setReceiveStatus(offer.id, 2);
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
-                            redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:response.tradeofferid,betId: offer.id,time: date.now()}));
+                            var unix = Math.round(+new Date()/1000);
+                            redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:response.tradeofferid,betId: offer.id,time: unix}));
                         });
                     });
                 } else {
