@@ -51,7 +51,8 @@ var checkingOffers = [],
 
 const redisChannels = {
     receiveBetItems: config.prefix + 'receiveBetItems.list',
-    sendWinnerPrizeList: config.prefix + 'sendWinnerPrizeDuel.list'
+    sendWinnerPrizeList: config.prefix + 'sendWinnerPrizeDuel.list',
+    checkOfferStateList: config.prefix + 'checkOfferState.list'
 };
 
 function steamBotLogger(log){
@@ -277,7 +278,7 @@ var sendPrizeOffer = function(offerJson) {
         });
 
     });
-}
+};
 
 var setReceiveStatus = function(item,status){
     requestify.post(config.domain+'/api/duel/setReceiveStatus', {
@@ -290,7 +291,20 @@ var setReceiveStatus = function(item,status){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
-}
+};
+var checkOffer = function(offerJson){
+    var offer = JSON.parse(offerJson);
+    offers.getOffer({tradeofferid: offer.tradeId},function(err,response){
+        if(err) {
+            steamBotLogger('Error on getOffer:');
+            console.log(err);
+            checkProcceed = false;
+            return;
+        }
+        console.log(response);
+        checkProcceed = false;
+    });
+};
 var sendTradeOffer = function(offerJson){
     var d = domain.create();
     d.on('error', function(err) {
@@ -359,6 +373,7 @@ var sendTradeOffer = function(offerJson){
                             receiveProcceed = false;
                             setReceiveStatus(offer.id, 2);
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
+                            redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:response.tradeofferid,betId: offer.id,time: date.now()}));
                         });
                     });
                 } else {
@@ -384,6 +399,7 @@ var is_checkingOfferExists = function(tradeofferid){
     }
     return false;
 }
+
 var queueProceed = function(){
     //Выдача выигрыша
     redisClient.llen(redisChannels.sendWinnerPrizeList, function(err, length) {
@@ -405,9 +421,20 @@ var queueProceed = function(){
             });
         }
     });
+    //Проверка принятия офферов
+    redisClient.llen(redisChannels.checkOfferStateList,function (err,length) {
+        if(length > 0 && !checkProcceed && WebSession) {
+            steamBotLogger('checkOfferList: ' + length);
+            checkProcceed = true;
+            redisClient.lindex(redisChannels.checkOfferStateList,0,function(err,offerJson){
+                checkOffer(offerJson);
+            });
+        }
+    });
 }
 var receiveProcceed = false;
 var sendWinnerProcceed = false;
+var checkProcceed = false;
 setInterval(queueProceed, 1500);
 function str_replace ( search, replace, subject ) {
     if(!(replace instanceof Array)){
