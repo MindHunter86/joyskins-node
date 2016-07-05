@@ -294,7 +294,7 @@ var setReceiveStatus = function(item,status){
 };
 var checkOffer = function(offerJson){
     var offer = JSON.parse(offerJson);
-    console.log(offer);
+    console.log(offer.tradeId);
     offers.getOffer({
         tradeofferid: offer.tradeId
     },function(err,response){
