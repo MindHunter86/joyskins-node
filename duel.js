@@ -294,14 +294,19 @@ var setReceiveStatus = function(item,status){
 };
 var checkOffer = function(offerJson){
     var offer = JSON.parse(offerJson);
-    offers.getOffer({tradeofferid: offer.tradeId},function(err,response){
+    console.log(offer);
+    offers.getOffer({
+        tradeofferid: offer.tradeId
+    },function(err,response){
+        console.log(response);
         if(err) {
+
             steamBotLogger('Error on getOffer:');
             console.log(err);
             checkProcceed = false;
             return;
         }
-        console.log(response);
+
         checkProcceed = false;
     });
 };
