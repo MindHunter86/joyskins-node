@@ -296,7 +296,7 @@ var checkOffer = function(offerJson){
     var offer = JSON.parse(offerJson);
     console.log(offer.tradeId);
     offers.getOffer({
-        tradeofferid: offer.tradeId
+        tradeOfferId: offer.tradeId
     },function(err,response){
         console.log(response);
         if(err) {
