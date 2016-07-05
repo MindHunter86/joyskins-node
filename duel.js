@@ -200,7 +200,7 @@ var setPrizeStatus = function(item, status){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
-}
+};
 var sendPrizeOffer = function(offerJson) {
     var d = domain.create();
     d.on('error', function(err) {
@@ -296,17 +296,35 @@ var checkOffer = function(offerJson){
     var offer = JSON.parse(offerJson);
     console.log(offer.tradeId);
     offers.getOffer({
-        tradeOfferId: offer.tradeId
+        tradeofferid: offer.tradeId
     },function(err,response){
-        console.log(response);
         if(err) {
-
             steamBotLogger('Error on getOffer:');
             console.log(err);
             checkProcceed = false;
             return;
         }
-
+        if(response.response && response.response.offer) {
+            if(response.response.offer.trade_offer_state == 3) {
+                redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+                    steamBotLogger('acceptedOffer state');
+                    setReceiveStatus(offer.betId,1);
+                });
+            } else if(response.response.offer.trade_offer_state != 2) {
+                redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+                    steamBotLogger('declineOffer state');
+                    setReceiveStatus(offer.betId,4);
+                    if(response.response.offer.trade_offer_state != 6 && response.response.offer.trade_offer_state != 7) {
+                        offers.cancelOffer({tradeOfferId: offer.tradeofferid});
+                    }
+                });
+            }
+        } else {
+            console.log('Error on get offer response');
+            redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+               setReceiveStatus(offer.betId,3);
+            });
+        }
         checkProcceed = false;
     });
 };
