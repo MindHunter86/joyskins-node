@@ -289,6 +289,7 @@ var setReceiveStatus = function(item,status){
         .then(function(response) {
         },function(response){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
+            console.log(response);  
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
 };
