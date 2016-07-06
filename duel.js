@@ -323,6 +323,7 @@ var checkOffer = function(offerJson){
             if(response.response.offer.trade_offer_state == 3) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                     steamBotLogger('acceptedOffer state');
+                    console.log(data);
                     offers.getItems({tradeofferid:offer.tradeId},function (err,items) {
                         console.log(items);
                         setReceiveStatus(offer.betId,1);
