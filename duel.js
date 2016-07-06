@@ -299,6 +299,17 @@ var checkOffer = function(offerJson){
     if(checkArrGlobal[offer.tradeId])
         return;
     checkArrGlobal[offer.tradeId] = 1;
+    var unix = Math.round(+new Date()/1000);
+    if(unix-offer.time > 90)
+    {
+        redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+            steamBotLogger('timeout for '+offer.tradeId);
+            setReceiveStatus(offer.betId,4);
+            offers.cancelOffer({tradeOfferId: offer.tradeId});
+        });
+        checkArrGlobal[offer.tradeId] = 0;
+        return;
+    }
     offers.getOffer({
         tradeofferid: offer.tradeId
     },function(err,response){
