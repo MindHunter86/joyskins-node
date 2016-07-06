@@ -205,7 +205,7 @@ var sendPrizeOffer = function(offerJson) {
     var d = domain.create();
     d.on('error', function(err) {
         console.log(err.stack);
-        console.tag('SteamBotDuel').error('Error to send offer');
+        console.tag('SteamBotDuel').error('Error to send prize offer');
         sendWinnerProcceed = false;
     });
     var offer = JSON.parse(offerJson);
@@ -253,7 +253,7 @@ var sendPrizeOffer = function(offerJson) {
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                                        setPrizeStatus(offer.id, 4);
+                                        setPrizeStatus(offer.id, 2);
                                         sendWinnerProcceed = false;
                                     });
                                 }
@@ -263,7 +263,7 @@ var sendPrizeOffer = function(offerJson) {
                         }
                         redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
                             sendWinnerProcceed = false;
-                            setPrizeStatus(offer.id, 3);
+                            setPrizeStatus(offer.id, 1);
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
                         });
                     });
