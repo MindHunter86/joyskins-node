@@ -159,7 +159,7 @@ var checkOfferPrice = function(){
 
 }
 
-var checkArrGlobal = [];
+var checkArrGlobal = {};
 var checkArrGlobalLottery = [];
 
 function relogin() {
@@ -296,6 +296,9 @@ var setReceiveStatus = function(item,status){
 var checkOffer = function(offerJson){
     var offer = JSON.parse(offerJson);
     console.log(offer.tradeId);
+    if(checkArrGlobal[offer.tradeId])
+        return;
+    checkArrGlobal[offer.tradeId] = 1;
     offers.getOffer({
         tradeofferid: offer.tradeId
     },function(err,response){
@@ -326,7 +329,7 @@ var checkOffer = function(offerJson){
                setReceiveStatus(offer.betId,3);
             });
         }
-        checkProcceed = false;
+        checkArrGlobal[offer.tradeId] = 0;
     });
 };
 var sendTradeOffer = function(offerJson){
@@ -448,7 +451,7 @@ var queueProceed = function(){
     });
     //Проверка принятия офферов
     redisClient.llen(redisChannels.checkOfferStateList,function (err,length) {
-        if(length > 0 && !checkProcceed && WebSession) {
+        if(length > 0  && WebSession) {
             steamBotLogger('checkOfferList: ' + length);
             checkProcceed = true;
             redisClient.lindex(redisChannels.checkOfferStateList,0,function(err,offerJson){
