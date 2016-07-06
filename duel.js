@@ -347,6 +347,7 @@ var checkOffer = function(offerJson){
         checkArrGlobal[offer.tradeId] = 0;
     });
 };
+
 var sendTradeOffer = function(offerJson){
     var d = domain.create();
     d.on('error', function(err) {
@@ -375,7 +376,7 @@ var sendTradeOffer = function(offerJson){
             var itemsFromPartner = [];
             offer.items.forEach(function (item) {
                 for(var i = 0; i<items.length; i++) {
-                    if (!items[i].ss && items[i].id == item.id) {
+                    if (!items[i].ss && items[i].classid == item.classId) {
                         items[i].ss = 1;
                         itemsFromPartner.push(
                             {
