@@ -323,7 +323,11 @@ var checkOffer = function(offerJson){
             if(response.response.offer.trade_offer_state == 3) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                     steamBotLogger('acceptedOffer state');
-                    setReceiveStatus(offer.betId,1);
+                    offers.getItems({tradeofferid:offer.tradeId},function (items) {
+                        console.log(items);
+                        setReceiveStatus(offer.betId,1);
+                    });
+
                 });
             } else if(response.response.offer.trade_offer_state != 2) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
