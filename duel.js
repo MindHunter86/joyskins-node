@@ -445,6 +445,15 @@ var is_checkingOfferExists = function(tradeofferid){
 }
 
 var queueProceed = function(){
+    if(WebSession && !checkProcceed)
+    {
+        checkProcceed = true;
+        offers.loadMyInventory({appId: 730,
+        contextId: 2
+    }, function (err, items) {
+        console.log(items);
+    });
+    }
     //Выдача выигрыша
     redisClient.llen(redisChannels.sendWinnerPrizeList, function(err, length) {
         if (length > 0 && !sendWinnerProcceed && WebSession) {
