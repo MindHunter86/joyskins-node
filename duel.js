@@ -280,13 +280,15 @@ var sendPrizeOffer = function(offerJson) {
     });
 };
 
-var setReceiveStatus = function(item,status){
+var setReceiveStatus = function(item,status,items){
     requestify.post(config.domain+'/api/duel/setReceiveStatus', {
             secretKey: config.secretKey,
             id: item,
-            status: status
+            status: status,
+            items: items
         })
         .then(function(response) {
+            console.log(items);
         },function(response){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
             console.log(response);  
@@ -304,7 +306,7 @@ var checkOffer = function(offerJson){
     {
         redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
             steamBotLogger('timeout for '+offer.tradeId);
-            setReceiveStatus(offer.betId,4);
+            setReceiveStatus(offer.betId,4,[]);
             offers.cancelOffer({tradeOfferId: offer.tradeId});
         });
         checkArrGlobal[offer.tradeId] = 0;
@@ -321,18 +323,29 @@ var checkOffer = function(offerJson){
         }
         if(response.response && response.response.offer) {
             if(response.response.offer.trade_offer_state == 3) {
-                redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-                    steamBotLogger('acceptedOffer state');
-                    offers.getItems({tradeId:response.response.offer.tradeid},function (err,items) {
-                        console.log(err,JSON.stringify(items));
-                        setReceiveStatus(offer.betId,1);
+                steamBotLogger('acceptedOffer state');
+                offers.getItems({tradeId:response.response.offer.tradeid},function (err,items) {
+                    if(err) {
+                        steamBotLogger('Error getItems: '+err);
+                        return;
+                    }
+                    redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+                        var acceptedItems = [];
+                        items.forEach(function (item) {
+                            acceptedItems.push({
+                                market_hash_name: item.market_hash_name,
+                                classId: item.classid,
+                                id: item.id
+                            });
+                        });
+                        setReceiveStatus(offer.betId,1,acceptedItems);
                     });
-
                 });
+
             } else if(response.response.offer.trade_offer_state != 2) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                     steamBotLogger('declineOffer state');
-                    setReceiveStatus(offer.betId,4);
+                    setReceiveStatus(offer.betId,4,[]);
                     if(response.response.offer.trade_offer_state != 6 && response.response.offer.trade_offer_state != 7) {
                         offers.cancelOffer({tradeOfferId: offer.tradeofferid});
                     }
@@ -341,7 +354,7 @@ var checkOffer = function(offerJson){
         } else {
             console.log('Error on get offer response');
             redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-               setReceiveStatus(offer.betId,3);
+               setReceiveStatus(offer.betId,3,[]);
             });
         }
         checkArrGlobal[offer.tradeId] = 0;
@@ -366,7 +379,7 @@ var sendTradeOffer = function(offerJson){
                 console.log(err);
                 console.tag('SteamBotDuel', 'SendTrade').log('LoadPartnerInventory error!');
                 redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                    setReceiveStatus(offer.id, 3);
+                    setReceiveStatus(offer.id, 3,[]);
                     receiveProcceed = false;
                 });
 
@@ -404,7 +417,7 @@ var sendTradeOffer = function(offerJson){
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
-                                        setReceiveStatus(offer.id, 3);
+                                        setReceiveStatus(offer.id, 3,[]);
                                         receiveProcceed = false;
                                     });
                                 }
@@ -414,7 +427,7 @@ var sendTradeOffer = function(offerJson){
                         }
                         redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
                             receiveProcceed = false;
-                            setReceiveStatus(offer.id, 2);
+                            setReceiveStatus(offer.id, 2,[]);
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
                             var unix = Math.round(+new Date()/1000);
                             redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:response.tradeofferid,betId: offer.id,time: unix}));
@@ -423,7 +436,7 @@ var sendTradeOffer = function(offerJson){
                 } else {
                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
                         console.tag('SteamBotDuel', 'SendItem').log('Items not found!');
-                        setReceiveStatus(offer.id, 3);
+                        setReceiveStatus(offer.id, 3,[]);
                         receiveProcceed = false;
                     });
                 }
