@@ -67,6 +67,9 @@ redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'newJoin') {
         io.sockets.emit(channel,message);
     }
+    if(channel == config.preft + 'userLeftRoom') {
+        io.sockets.emit(channel,message);
+    }
     if(channel == config.prefix + 'newDeposit'){
         io.sockets.emit(channel, message);
 
