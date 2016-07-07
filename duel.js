@@ -317,7 +317,7 @@ var checkOffer = function(offerJson){
         if(err) {
             steamBotLogger('Error on getOffer:');
             console.log(err);
-            checkProcceed = false;
+            checkArrGlobal[offer.tradeId] = 0;
             return;
         }
         if(response.response && response.response.offer) {
@@ -326,6 +326,7 @@ var checkOffer = function(offerJson){
                 offers.getItems({tradeId:response.response.offer.tradeid},function (err,items) {
                     if(err) {
                         steamBotLogger('Error getItems: '+err);
+                        checkArrGlobal[offer.tradeId] = 0;
                         return;
                     }
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
