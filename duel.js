@@ -352,7 +352,9 @@ var checkOffer = function(offerJson){
                     }
                     checkArrGlobal[offer.tradeId] = 0;
                 });
+                return;
             }
+            checkArrGlobal[offer.tradeId] = 0;
         } else {
             console.log('Error on get offer response');
             redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
