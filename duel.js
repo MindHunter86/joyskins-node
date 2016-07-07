@@ -285,10 +285,10 @@ var setReceiveStatus = function(item,status,items){
             secretKey: config.secretKey,
             id: item,
             status: status,
-            items: items
+            items: JSON.stringify(items)
         })
         .then(function(response) {
-            console.log(items);
+            console.log(JSON.stringify(items));
         },function(response){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
             console.log(response);  
