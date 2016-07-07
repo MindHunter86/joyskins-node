@@ -307,8 +307,8 @@ var checkOffer = function(offerJson){
             steamBotLogger('timeout for '+offer.tradeId);
             setReceiveStatus(offer.betId,4,[]);
             offers.cancelOffer({tradeOfferId: offer.tradeId});
+            checkArrGlobal[offer.tradeId] = 0;
         });
-        checkArrGlobal[offer.tradeId] = 0;
         return;
     }
     offers.getOffer({
@@ -338,6 +338,7 @@ var checkOffer = function(offerJson){
                             });
                         });
                         setReceiveStatus(offer.betId,1,acceptedItems);
+                        checkArrGlobal[offer.tradeId] = 0;
                     });
                 });
 
@@ -348,15 +349,16 @@ var checkOffer = function(offerJson){
                     if(response.response.offer.trade_offer_state != 6 && response.response.offer.trade_offer_state != 7) {
                         offers.cancelOffer({tradeOfferId: offer.tradeofferid});
                     }
+                    checkArrGlobal[offer.tradeId] = 0;
                 });
             }
         } else {
             console.log('Error on get offer response');
             redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-               setReceiveStatus(offer.betId,3,[]);
+                setReceiveStatus(offer.betId,3,[]);
+                checkArrGlobal[offer.tradeId] = 0;
             });
         }
-        checkArrGlobal[offer.tradeId] = 0;
     });
 };
 
