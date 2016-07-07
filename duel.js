@@ -221,7 +221,7 @@ var sendPrizeOffer = function(offerJson) {
                 sendWinnerProcceed = false;
                 return;
             }
-
+            console.log(offerJson);
             var itemsFromMe = [];
             offer.items.forEach(function (item) {
                 for(var i=0; i < items.length; i++)
