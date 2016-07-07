@@ -254,6 +254,7 @@ var sendPrizeOffer = function(offerJson) {
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
                                         setPrizeStatus(offer.id, 2);
+                                        console.log(err);
                                         sendWinnerProcceed = false;
                                     });
                                 }
