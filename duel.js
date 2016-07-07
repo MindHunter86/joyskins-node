@@ -289,16 +289,13 @@ var setReceiveStatus = function(item,status,items){
             items: JSON.stringify(items)
         })
         .then(function(response) {
-            console.log(JSON.stringify(items));
         },function(response){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
-            console.log(response);  
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
 };
 var checkOffer = function(offerJson){
     var offer = JSON.parse(offerJson);
-    console.log(offer.tradeId);
     if(checkArrGlobal[offer.tradeId])
         return;
     checkArrGlobal[offer.tradeId] = 1;
@@ -370,7 +367,6 @@ var sendTradeOffer = function(offerJson){
         receiveProcceed = false;
     });
     var offer = JSON.parse(offerJson);
-    console.log(offer);
         offers.loadPartnerInventory({
             partnerSteamId: offer.partnerSteamId,
             contextId: 2,
