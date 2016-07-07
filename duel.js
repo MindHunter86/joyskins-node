@@ -324,7 +324,7 @@ var checkOffer = function(offerJson){
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                     steamBotLogger('acceptedOffer state');
                     offers.getItems({tradeId:response.response.offer.tradeid},function (err,items) {
-                        console.log(items);
+                        console.log(err,JSON.stringify(items));
                         setReceiveStatus(offer.betId,1);
                     });
 
