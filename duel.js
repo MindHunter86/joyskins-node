@@ -323,7 +323,7 @@ var checkOffer = function(offerJson){
             if(response.response.offer.trade_offer_state == 3) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                     steamBotLogger('acceptedOffer state');
-                    offers.getItems({tradeId:response.response.offer.tradeofferid},function (err,items) {
+                    offers.getItems({tradeId:response.response.offer.tradeid},function (err,items) {
                         console.log(items);
                         setReceiveStatus(offer.betId,1);
                     });
@@ -445,15 +445,6 @@ var is_checkingOfferExists = function(tradeofferid){
 }
 
 var queueProceed = function(){
-    if(WebSession && !checkProcceed)
-    {
-        checkProcceed = true;
-        offers.loadMyInventory({appId: 730,
-        contextId: 2
-    }, function (err, items) {
-        console.log(items);
-    });
-    }
     //Выдача выигрыша
     redisClient.llen(redisChannels.sendWinnerPrizeList, function(err, length) {
         if (length > 0 && !sendWinnerProcceed && WebSession) {
