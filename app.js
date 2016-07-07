@@ -35,6 +35,9 @@ redisClient.subscribe(config.prefix + 'newDeposit');
 redisClient.subscribe(config.prefix + 'newPlayer');
 redisClient.subscribe(config.prefix + 'depositDecline');
 redisClient.subscribe(config.prefix + 'show.lottery.winners');
+redisClient.subscribe(config.prefix + 'newRoom');
+redisClient.subscribe(config.prefix + 'newJoin');
+redisClient.subscribe(config.prefix + 'show.duel.winner');
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
@@ -56,6 +59,9 @@ redisClient.on("message", function(channel, message) {
         showSliderWinnersLottery();
     }
     if(channel == config.prefix + 'newPlayer'){
+        io.sockets.emit(channel, message);
+    }
+    if(channel == config.prefix + 'newRoom') {
         io.sockets.emit(channel, message);
     }
     if(channel == config.prefix + 'newDeposit'){
