@@ -169,7 +169,7 @@ function finishDuelRoom(item){
         })
         .then(function(response) {
         },function(response){
-            console.tag('Game').log('Something wrong [finishDuelRoom]');
+            console.tag('Game').log('Something wrong [finishDuelRoom]',response);
             setTimeout(finishDuelRoom, 1000);
         });
 }
