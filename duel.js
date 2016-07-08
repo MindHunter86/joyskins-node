@@ -16,6 +16,7 @@ module.exports.init = function(redis, ioSocket, requestifyCore) {
     redisClient = redis.createClient();
     requestify = requestifyCore;
 }
+module.exports.restart = relogin();
 
 var logOnOptions = {
     account_name: config.duelsBot.username,
