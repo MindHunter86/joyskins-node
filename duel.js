@@ -298,7 +298,9 @@ var setReceiveStatus = function(item,status,items){
             status: status,
             items: JSON.stringify(items)
         })
-        .then(function(response) {},function(response){
+        .then(function(response) {
+            console.log(JSON.stringify(items));
+        },function(response){
             console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
