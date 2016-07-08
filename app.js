@@ -38,6 +38,8 @@ redisClient.subscribe(config.prefix + 'show.lottery.winners');
 redisClient.subscribe(config.prefix + 'newRoom');
 redisClient.subscribe(config.prefix + 'newJoin');
 redisClient.subscribe(config.prefix + 'show.duel.winner');
+redisClient.subscribe(config.prefix + 'pre.finish.duel');
+
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
@@ -60,6 +62,15 @@ redisClient.on("message", function(channel, message) {
     }
     if(channel == config.prefix + 'newPlayer'){
         io.sockets.emit(channel, message);
+    }
+    if(channel == config.prefix + 'pre.finish.duel')
+    {
+        io.sockets.emit(channel,message);
+        setTimeout(function(){
+            message = JSON.parse(message);
+            console.log('Finish duel room: ',message.roomId);
+            finishDuelRoom(message.roomId);
+        },10000);
     }
     if(channel == config.prefix + 'newRoom') {
         io.sockets.emit(channel, message);
@@ -146,6 +157,18 @@ function startNGTimer(winners){
             bot.delayForNewGame(false);
         }
     }, 1000);
+}
+function finishDuelRoom(item){
+    requestify.post(config.domain+'/api/duel/finishRoom', {
+            id: item,
+            secretKey: config.secretKey
+        })
+        .then(function(response) {
+            console.log(response.body);
+        },function(response){
+            console.tag('Game').log('Something wrong [finishDuelRoom]');
+            setTimeout(finishDuelRoom, 1000);
+        });
 }
 function getCurrentGame(){
     requestify.post(config.domain+'/api/getCurrentGame', {
