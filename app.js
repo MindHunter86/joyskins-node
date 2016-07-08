@@ -45,7 +45,7 @@ redisClient.on("message", function(channel, message) {
     }
     if(channel == config.prefix + 'refresh.bot'){
         console.log('Refresh from Admin Panel');
-        process.exit(0);
+        duel.relogin();
     }
     if(channel == config.prefix + 'show.winners'){
         clearInterval(timer);

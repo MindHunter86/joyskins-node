@@ -177,7 +177,7 @@ function relogin() {
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
             confirmations.startConfirmationChecker(10000, config.shopBot.identitySecret);
-            steamBotLogger('Setup Offers!');
+            steamBotLogger('Setup Offers! RELOGIN');
         });
     });
 }
