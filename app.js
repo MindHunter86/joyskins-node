@@ -168,7 +168,7 @@ function finishDuelRoom(item){
             secretKey: config.secretKey
         })
         .then(function(response) {
-            console.log(response.body);
+           
         },function(response){
             console.tag('Game').log('Something wrong [finishDuelRoom]');
             setTimeout(finishDuelRoom, 1000);
