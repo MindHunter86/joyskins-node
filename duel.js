@@ -16,7 +16,10 @@ module.exports.init = function(redis, ioSocket, requestifyCore) {
     redisClient = redis.createClient();
     requestify = requestifyCore;
 }
-module.exports.restart = relogin();
+module.exports.restart = function(){
+    steamBotLogger('RELOAD from admin panel');
+    relogin();
+};
 
 var logOnOptions = {
     account_name: config.duelsBot.username,
@@ -165,19 +168,25 @@ var checkArrGlobalLottery = [];
 
 function relogin() {
     steamWebLogOn.webLogOn(function(sessionID, newCookie) {
+        console.log('steamWebLogOn');
         getSteamAPIKey({
             sessionID: sessionID,
             webCookie: newCookie
         }, function(err, APIKey) {
+            console.log('getSteamAPIKey');
+            if(err) {
+                steamBotLogger(err);
+            }
             offers.setup({
                 sessionID: sessionID,
                 webCookie: newCookie,
                 APIKey: APIKey
             });
+            console.log(APIKey);
             WebSession = true;
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
-            confirmations.startConfirmationChecker(10000, config.shopBot.identitySecret);
+            confirmations.startConfirmationChecker(10000, config.duelsBot.identitySecret);
             steamBotLogger('Setup Offers! RELOGIN');
         });
     });
