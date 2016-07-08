@@ -63,6 +63,10 @@ redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'newPlayer'){
         io.sockets.emit(channel, message);
     }
+    if(channel == config.prefix + 'show.duel.winner')
+    {
+        io.sockets.emit(channel,message);
+    }
     if(channel == config.prefix + 'pre.finish.duel')
     {
         io.sockets.emit(channel,message);
