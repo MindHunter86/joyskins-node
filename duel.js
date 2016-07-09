@@ -207,7 +207,8 @@ var setPrizeStatus = function(item, status){
         })
         .then(function(response) {
         },function(response){
-            console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
+            console.tag('SteamBotDuel').error('Something wrong with setPrizeStatus. Retry...');
+            console.log(response);
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
 };
@@ -301,7 +302,8 @@ var setReceiveStatus = function(item,status,items){
         .then(function(response) {
             console.log(JSON.stringify(items));
         },function(response){
-            console.tag('SteamBotDuel').error('Something wrong with setItemStatus. Retry...');
+            console.tag('SteamBotDuel').error('Something wrong with setReceiveStats. Retry...');
+            console.log(response);
             setTimeout(function(){setPrizeStatus()}, 1000);
         });
 };
