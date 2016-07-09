@@ -296,7 +296,7 @@ var setReceiveStatus = function(item,status,items){
             secretKey: config.secretKey,
             id: item,
             status: status,
-            items: JSON.stringify(items)
+            items: encodeURIComponent(JSON.stringify(items))
         })
         .then(function(response) {
             console.log(JSON.stringify(items));
