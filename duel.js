@@ -506,8 +506,8 @@ var queueProceed = function(){
         if(length > 0  && WebSession) {
             steamBotLogger('checkOfferList: ' + length);
             checkProcceed = true;
-            for(var i = 0; i < length; i++)
-                redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
+            //for(var i = 0; i < length; i++)
+                redisClient.lindex(redisChannels.checkOfferStateList,0,function(err,offerJson){
                     checkOffer(offerJson);
                 });
         }
