@@ -560,6 +560,6 @@ setTimeout(function(){
 },50000);
 setInterval(function(){
     steamBotLogger('loggedOn:'+steamClient.loggedOn,' c0nnected:'+steamClient.connected);
-    if(!loggedOn)
+    if(!steamClient.loggedOn)
         relogin();
 },10000);
