@@ -167,6 +167,9 @@ var checkArrGlobal = {};
 var checkArrGlobalLottery = [];
 
 function relogin() {
+    if(!steamClient.connected)
+        return steamClient.connect();
+    steamFriends.setPersonaState(Steam.EPersonaState.Online);
     steamWebLogOn.webLogOn(function(sessionID, newCookie) {
         console.log('steamWebLogOn');
         getSteamAPIKey({
@@ -187,7 +190,7 @@ function relogin() {
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
             confirmations.startConfirmationChecker(10000, config.duelsBot.identitySecret);
-            steamBotLogger('Setup Offers! RELOGIN');
+            steamBotLogger('Setup Offers!');
         });
     });
 }
@@ -552,3 +555,10 @@ function str_replace ( search, replace, subject ) {
     return subject;
 
 }
+setTimeout(function(){
+    steamClient.disconnect();
+    steamClient.connect();
+},50000)
+setInterval(function(){
+    steamBotLogger('loggedOn:'+steamClient.loggedOn,' connected:'+steamClient.connected);
+},50000);
