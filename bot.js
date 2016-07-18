@@ -436,7 +436,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                     message: message
                 }, function (err, response) {
                     if (err) {
-                        console.log(err);
+                        console.log(err.toString());
                         if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('available') != -1) || (err.toString().indexOf('(15)') != -1)) {
                             console.log('true');
                             redisClient.lrem(redisChannels.sendOffersListLottery, 0, offerJson, function(err, data){
@@ -534,7 +534,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                     message: message
                 }, function (err, response) {
                     if (err) {
-                        console.log(err);
+                        console.log(err.toString());
                         if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('(20)') != -1)  ||(err.toString().indexOf('(15)') != -1) || (err.toString().indexOf('available') != -1)) {
                             console.log('true');
                             redisClient.lrem(redisChannels.sendOffersList, 0, offerJson, function(err, data){
