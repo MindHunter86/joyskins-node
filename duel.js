@@ -167,8 +167,9 @@ var checkArrGlobal = {};
 var checkArrGlobalLottery = [];
 
 function relogin() {
-    if(!steamClient.loggedOn)
-        return steamClient.connect();
+    if(!steamClient.loggedOn) {
+        steamClient.connect();
+    }
     steamFriends.setPersonaState(Steam.EPersonaState.Online);
     steamWebLogOn.webLogOn(function(sessionID, newCookie) {
         console.log('steamWebLogOn');
@@ -557,7 +558,7 @@ function str_replace ( search, replace, subject ) {
 }
 setTimeout(function(){
     steamClient.disconnect();
-},50000);
+},10000);
 setInterval(function(){
     steamBotLogger('loggedOn:'+steamClient.loggedOn,' c0nnected:'+steamClient.connected);
     if(!steamClient.loggedOn)
