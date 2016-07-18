@@ -448,7 +448,6 @@ var sendTradeOffer = function(offerJson){
                     message: 'Пополнение дуэлей: ' + config.domain
                 }, function (err, response) {
                     if (err) {
-                        console.log('err',err.message,offer);
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {

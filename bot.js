@@ -737,6 +737,7 @@ var queueProceed = function() {
             console.tag('SteamBot','Comission').info('Admin comission send list: '+ length);
             comissionProcceed = true;
             redisClient.lindex(redisChannels.sendAllItemsToAdmin,0,function(err, comissionJson){
+                console.log(comissionJson);
                 offer = JSON.parse(comissionJson);
                 offers.loadMyInventory({
                     appId: 730,
