@@ -7,10 +7,10 @@ var config = {
     prefix: '',
 	//настройка бота рулетки
     bot: {
-        username: 'aselleyarourse',
-        password: 'AUSvGghJbfyuMJ',
-        sharedSecret: 'hFCjzhgtmN4Rdn/lc3Pf7Ag+tCc=',
-        identitySecret: 'x+8MzBTaqlGJ5ZpYDpRerA5iS4M='
+        username: 'baidalenedal',
+        password: 'YsvVQa21Apk9',//
+        sharedSecret: 'i7Haiv/jaI2q1aXVVczYzhcTZm0=',
+        identitySecret: 'vt2lAeKhDS/6IdBosHMm36CB7mo='
     },
 	//настройки бота магазина
     shopBot: {
