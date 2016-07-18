@@ -46,8 +46,8 @@ redisClient.on("message", function(channel, message) {
         io.sockets.emit(channel, message);
     }
     if(channel == config.prefix + 'refresh.bot'){
-        console.log('Refresh from Admin Panel');
-        duel.restart();
+        console.tag('Admin').log('HARD RESTART APP.JS');
+        process.exit(0);
     }
     if(channel == config.prefix + 'show.winners'){
         clearInterval(timer);

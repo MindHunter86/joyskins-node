@@ -235,13 +235,12 @@ var sendPrizeOffer = function(offerJson) {
             contextId: 2
         }, function (err, items) {
             if(err) {
-                console.log(err);
+                console.tag('SteamBotDuel', 'SendTrade').error(err.message);
                 console.tag('SteamBotDuel', 'SendTrade').log('LoadMyInventory error!');
                 relogin();
                 sendWinnerProcceed = false;
                 return;
             }
-            console.log(offerJson);
             var itemsFromMe = [];
             offer.items.forEach(function (item) {
                 for(var i=0; i < items.length; i++)
@@ -270,7 +269,13 @@ var sendPrizeOffer = function(offerJson) {
                     message: 'Поздравляем с победой в раунде:  ' + offer.id
                     }, function (err, response) {
                         if (err) {
+                            console.tag('SteamBotDuel').error('offer.id :',offer.id,err.message);
                             getErrorCode(err.message, function (errCode) {
+                                if (errCode == 28)
+                                {
+                                    sendWinnerProcceed = false;
+                                    return;
+                                }
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
                                         setPrizeStatus(offer.id, 2);
@@ -410,13 +415,12 @@ var sendTradeOffer = function(offerJson){
             appId: 730
         }, function (err, items) {
             if(err) {
-                console.log(err);
+                console.log(err.message);
                 console.tag('SteamBotDuel', 'SendTrade').log('LoadPartnerInventory error!');
                 redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
                     setReceiveStatus(offer.id, 3,[]);
                     receiveProcceed = false;
                 });
-
                 return;
             }
 
@@ -445,10 +449,15 @@ var sendTradeOffer = function(offerJson){
                     accessToken: offer.accessToken,
                     itemsFromMe: [],
                     itemsFromThem: itemsFromPartner,
-                    message: 'Пополнение дуэлей: ' + config.domain
+                    message: 'Создание/Вступление в комнату на: ' + config.domain
                 }, function (err, response) {
                     if (err) {
+                        console.tag('SteamBotDuel').error(err.message);
                             getErrorCode(err.message, function (errCode) {
+                                if (errCode == 28){
+                                    receiveProcceed = false;
+                                    return;
+                                }
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
                                         setReceiveStatus(offer.id, 3,[]);

@@ -82,7 +82,7 @@ steamClient.on('logOnResponse', function(logonResp) {
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
-                console.log('getSteamAPIKey');
+                console.log('getSteamAPIKey',APIKey);
                 if(err) {
                     steamBotLogger(err);
                 }
@@ -91,7 +91,6 @@ steamClient.on('logOnResponse', function(logonResp) {
                     webCookie: newCookie,
                     APIKey: APIKey
                 });
-                console.log(APIKey);
                 WebSession = true;
                 globalSession = sessionID;
                 redisClient.lrange(redisChannels.tradeoffersList, 0, -1, function(err, offers){
@@ -263,11 +262,10 @@ steamUser.on('tradeOffers', function(number) {
 var parseOffer = function(offer, offerJson) {
     offers.loadPartnerInventory({partnerSteamId: offer.steamid_other, appId: 730, contextId: 2, tradeOfferId: offer.tradeofferid/*,language: "russian"*/}, function(err, hitems) {
         if (err) {
-
             //reWebLogOn(function() {
                 console.tag('SteamBot').error('parseOffer error, ReWebLogon');
                 if(countRetries[offerJson.tradeofferid] > 4) {
-                    console.tag('SteamBot').error('Error to load inventory: '+err);
+                    console.tag('SteamBot').error('Error to load inventory: '+err.message);
                     redisClient.multi([
                         ["lrem", redisChannels.usersQueue, 0, offer.steamid_other],
                         ['lrem', redisChannels.checkItemsList, 0, offerJson]
@@ -407,7 +405,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                     //setPrizeStatus(game, 1);
                     sendProcceedLottery = false;
                 //});
-                console.tag('SteamBot', 'SendPrize').log('LoadMyInventory error. Reset offers! Error: '+err);
+                console.tag('SteamBot', 'SendPrize').error('LoadMyInventory error. Reset offers! Error: '+err.message);
                 return;
             }
             var itemsFromMe = [],
@@ -437,8 +435,13 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                     message: message
                 }, function (err, response) {
                     if (err) {
-                        console.log(err.toString());
-                        if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('available') != -1) || (err.toString().indexOf('(15)') != -1)) {
+                        console.tag('SteamBot','LotterySend').error(err.message);
+                        if(err.message.indexOf('(28)') != -1)
+                        {
+                            sendProcceedLottery = false;
+                            return;
+                        }
+                        if((err.message.indexOf('(50)') != -1) || (err.message.indexOf('available') != -1) || (err.message.indexOf('(15)') != -1)) {
                             console.log('true');
                             redisClient.lrem(redisChannels.sendOffersListLottery, 0, offerJson, function(err, data){
                                 //setPrizeStatus(game, 2);
@@ -502,7 +505,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                     //setPrizeStatus(game, 1);
                     sendProcceed = false;
                 //});
-                console.tag('SteamBot', 'SendPrize').log('LoadMyInventory error. Reset offers!');
+                console.tag('SteamBot', 'SendPrize').log('LoadMyInventory error. Reset offers! :'+err.message);
                 return;
             }
             var itemsFromMe = [],
@@ -535,7 +538,12 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                     message: message
                 }, function (err, response) {
                     if (err) {
-                        console.log(err.toString());
+                        console.tag('SteamBot','sendTrade').error(err.message);
+                        if(err.message.indexOf('(28)') != -1)
+                        {
+                            sendProcceed = false;
+                            return;
+                        }
                         if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('(20)') != -1)  ||(err.toString().indexOf('(15)') != -1) || (err.toString().indexOf('available') != -1)) {
                             console.log('true');
                             redisClient.lrem(redisChannels.sendOffersList, 0, offerJson, function(err, data){
@@ -626,7 +634,7 @@ var checkedOffersProcceed = function(offerJson){
 
                 } else {
                     console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid);
-                    console.tag('SteamBot').log(err);
+                    console.tag('SteamBot').error(err.message);
                     offers.getOffer({tradeOfferId: offer.offerid}, function (err, body){
                         if(err) {
                             checkedProcceed = false;
@@ -746,6 +754,7 @@ var queueProceed = function() {
                     if(err) {
                         comissionProcceed = false;
                         console.tag('SteamBot', 'Comission').log('LoadMyInventory error. Reset offers! Error: '+err);
+                        relogin();
                         return;
                     }
                     var itemsFromMe = [],
@@ -769,7 +778,7 @@ var queueProceed = function() {
                         }
                     }
                     if (num > 0) {
-                        var message = 'Admin comission Joyskins.top';
+                        var message = 'Admin comission '+config.domain;
                         offers.makeOffer({
                             partnerAccountId: offer.partner,
                             accessToken: offer.accessToken,
@@ -778,7 +787,12 @@ var queueProceed = function() {
                             message: message
                         }, function (err, response) {
                             if (err) {
-                                console.log(err);
+                                console.tag('SteamBot','Comission').error(err.message);
+                                if(err.message.indexOf('(28)') != -1)
+                                {
+                                    comissionProcceed = false;
+                                    return;
+                                }
                                 if((err.toString().indexOf('(50)') != -1) || (err.toString().indexOf('available') != -1) || (err.toString().indexOf('(15)') != -1)) {
                                     console.log('true');
                                     redisClient.lrem(redisChannels.sendAllItemsToAdmin, 0, comissionJson, function(err, data){
