@@ -113,7 +113,7 @@ steamClient.on('servers', function(servers) {
     //fs.writeFile('./config/servers', JSON.stringify(servers));
 });
 steamClient.on('error', function(error) {
-    console.log(error);
+    console.log(error.toString());
 });
 steamClient.on('loggedOff', function() {
     steamClient.connect();
@@ -134,6 +134,36 @@ steamUser.on('updateMachineAuth', function(sentry, callback) {
         });
     });
 }*/
+function relogin(){
+    steamBotLogger('relogin state');
+    if(!steamClient.loggedOn)
+        return steamClient.connect();
+    steamFriends.setPersonaState(Steam.EPersonaState.Online);
+
+    steamWebLogOn.webLogOn(function(sessionID, newCookie) {
+        console.log('steamWebLogOn');
+        getSteamAPIKey({
+            sessionID: sessionID,
+            webCookie: newCookie
+        }, function(err, APIKey) {
+            console.log('getSteamAPIKey');
+            if(err) {
+                steamBotLogger(err);
+            }
+            offers.setup({
+                sessionID: sessionID,
+                webCookie: newCookie,
+                APIKey: APIKey
+            });
+            console.log(APIKey);
+            WebSession = true;
+            globalSession = sessionID;
+            confirmations.setCookies(newCookie);
+            confirmations.startConfirmationChecker(10000, 'qkiz6mE/i6ZZnXNS8lc0zkMdD5E=');
+            steamBotLogger('Setup Offers!');
+        });
+    });
+}
 function addQueue(steamid, count) {
     counts = 0;
     responses = [];
@@ -232,6 +262,7 @@ steamUser.on('tradeOffers', function(number) {
 var parseOffer = function(offer, offerJson) {
     offers.loadPartnerInventory({partnerSteamId: offer.steamid_other, appId: 730, contextId: 2, tradeOfferId: offer.tradeofferid/*,language: "russian"*/}, function(err, hitems) {
         if (err) {
+
             //reWebLogOn(function() {
                 console.tag('SteamBot').error('parseOffer error, ReWebLogon');
                 if(countRetries[offerJson.tradeofferid] > 4) {
@@ -250,6 +281,7 @@ var parseOffer = function(offer, offerJson) {
                     });
                     return;
                 }
+                relogin();
                 countRetries[offerJson.tradeofferid]++;
                 parseOffer(offer, offerJson);
             //});
@@ -369,6 +401,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
             contextId: 2
         }, function (err, items) {
             if(err) {
+                relogin();
                 //reWebLogOn(function() {
                     //setPrizeStatus(game, 1);
                     sendProcceedLottery = false;
@@ -464,7 +497,8 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
         }, function (err, items) {
             if(err) {
                 //reWebLogOn(function() {
-                    setPrizeStatus(game, 1);
+                relogin();
+                    //setPrizeStatus(game, 1);
                     sendProcceed = false;
                 //});
                 console.tag('SteamBot', 'SendPrize').log('LoadMyInventory error. Reset offers!');
