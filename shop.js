@@ -25,7 +25,7 @@ var logOnOptions = {
 var authCode = ''; // code received by email
 
 try {
-    logOnOptions.two_factor_code = SteamTotp.getAuthCode('8z3EuTV1OuF13AyDVmQCpyLcz+I=');
+    logOnOptions.two_factor_code = SteamTotp.getAuthCode(config.shopBot.sharedSecret);
 } catch (e) {
     if (authCode !== '') {
         logOnOptions.auth_code = authCode;
@@ -75,6 +75,7 @@ steamClient.on('logOnResponse', function(logonResp) {
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
+                console.log('getSteamAPIKey');
                 offers.setup({
                     sessionID: sessionID,
                     webCookie: newCookie,
@@ -88,11 +89,12 @@ steamClient.on('logOnResponse', function(logonResp) {
                     });
                     handleOffers();
                 });
+                console.log('shop:',APIKey);
                 //redisClient.del(redisChannels.itemsToGive);
                 confirmations.setCookies(newCookie);
                 redisClient.del(redisChannels.itemsToSale);
-                confirmations.startConfirmationChecker(10000, 'Gz+2GzTeEzK3kRDTltiycctlVAE=');
-                steamBotLogger('Setup Offers!');//
+                confirmations.startConfirmationChecker(10000, config.shopBot.identitySecret);
+                steamBotLogger('Setup Offers!');
             });
         });
     }
@@ -196,7 +198,7 @@ function relogin() {
             WebSession = true;
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
-            confirmations.startConfirmationChecker(10000, 'Gz+2GzTeEzK3kRDTltiycctlVAE=');
+            confirmations.startConfirmationChecker(10000, config.shopBot.identitySecret);
             steamBotLogger('Setup Offers!');
         });
     });
@@ -279,7 +281,7 @@ var sendTradeOffer = function(offerJson){
 
 
 var setItemStatus = function(item, status){
-    requestify.post('https://'+config.domain+'/api/shop/setItemStatus', {
+    requestify.post(config.domain+'/api/shop/setItemStatus', {
         secretKey: config.secretKey,
         id: item,
         status: status
@@ -292,7 +294,7 @@ var setItemStatus = function(item, status){
 }
 
 var addNewItems = function(){
-    requestify.post('https://'+config.domain+'/api/shop/newItems', {
+    requestify.post(config.domain+'/api/shop/newItems', {
         secretKey: config.secretKey
     })
         .then(function(response) {

@@ -1,9 +1,4 @@
 var fs = require('fs');
-/*var https_options = {
-    //ca: fs.readFileSync("/var/projects/itemup.ru/crts/ca-bundle.pem"),
-    key: fs.readFileSync("/var/projects/itemup.ru/crts/www.itemupru.key"),
-    cert: fs.readFileSync("/var/projects/itemup.ru/crts/www.itemupru.pem")
-};*/
 var auth = require('http-auth'),
     scribe = require('scribe-js')(),
     console = process.console,
@@ -13,17 +8,19 @@ var auth = require('http-auth'),
     io      = require('socket.io')(server),
     redis   = require('redis'),
     requestify   = require('requestify'),
-    bot     = require('./bot.js'),
-    shop     = require('./shop.js');
+  //  bot     = require('./bot.js');
+   // shop     = require('./shop.js'),
+    duel = require('./duel.js');
 
 var redisClient = redis.createClient(),
     client = redis.createClient();
 
-bot.init(redis, io, requestify);
-shop.init(redis, requestify);
-server.listen(8080, '127.0.0.1');
+//bot.init(redis, io, requestify);
+//shop.init(redis, requestify);
+duel.init(redis,io,requestify);
+server.listen(8080);
 
-console.log('Server started on ' + config.domain + ':5000');
+console.log('Server started on ' + config.domain + ':8080');
 
 var basicAuth = auth.basic({ //basic auth config
     realm: "WebPanel",
@@ -38,6 +35,10 @@ redisClient.subscribe(config.prefix + 'newDeposit');
 redisClient.subscribe(config.prefix + 'newPlayer');
 redisClient.subscribe(config.prefix + 'depositDecline');
 redisClient.subscribe(config.prefix + 'show.lottery.winners');
+redisClient.subscribe(config.prefix + 'newRoom');
+redisClient.subscribe(config.prefix + 'newJoin');
+redisClient.subscribe(config.prefix + 'show.duel.winner');
+redisClient.subscribe(config.prefix + 'pre.finish.duel');
 
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
@@ -46,7 +47,7 @@ redisClient.on("message", function(channel, message) {
     }
     if(channel == config.prefix + 'refresh.bot'){
         console.log('Refresh from Admin Panel');
-        process.exit(0);
+        duel.restart();
     }
     if(channel == config.prefix + 'show.winners'){
         clearInterval(timer);
@@ -62,6 +63,28 @@ redisClient.on("message", function(channel, message) {
     if(channel == config.prefix + 'newPlayer'){
         io.sockets.emit(channel, message);
     }
+    if(channel == config.prefix + 'show.duel.winner')
+    {
+        io.sockets.emit(channel,message);
+    }
+    if(channel == config.prefix + 'pre.finish.duel')
+    {
+        io.sockets.emit(channel,message);
+        setTimeout(function(){
+            message = JSON.parse(message);
+            console.log('Finish duel room: ',message.roomId);
+            finishDuelRoom(message.roomId);
+        },10000);
+    }
+    if(channel == config.prefix + 'newRoom') {
+        io.sockets.emit(channel, message);
+    }
+    if(channel == config.prefix + 'newJoin') {
+        io.sockets.emit(channel,message);
+    }
+    if(channel == config.preft + 'userLeftRoom') {
+        io.sockets.emit(channel,message);
+    }
     if(channel == config.prefix + 'newDeposit'){
         io.sockets.emit(channel, message);
 
@@ -76,7 +99,6 @@ redisClient.on("message", function(channel, message) {
 io.sockets.on('connection', function(socket) {
 
     updateOnline();
-
     socket.on('disconnect', function(){
         updateOnline();
     })
@@ -140,11 +162,23 @@ function startNGTimer(winners){
         }
     }, 1000);
 }
+function finishDuelRoom(item){
+    requestify.post(config.domain+'/api/duel/finishRoom', {
+            id: item,
+            secretKey: config.secretKey
+        })
+        .then(function(response) {
+        },function(response){
+            console.tag('Game').log('Something wrong [finishDuelRoom]',response);
+            setTimeout(finishDuelRoom, 1000);
+        });
+}
 function getCurrentGame(){
-    requestify.post('https://'+config.domain+'/api/getCurrentGame', {
+    requestify.post(config.domain+'/api/getCurrentGame', {
         secretKey: config.secretKey
     })
         .then(function(response) {
+            console.log(response.body);
             game = JSON.parse(response.body);
             console.tag('Game').log('Current Game #' + game.id);
             if(game.status == 1) startTimer();
@@ -156,7 +190,7 @@ function getCurrentGame(){
         });
 }
 function newLottery(){
-    requestify.post('https://'+config.domain+'/api/newLottery', {
+    requestify.post(config.domain+'/api/newLottery', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -171,7 +205,7 @@ function newLottery(){
         });
 }
 function newGame(){
-    requestify.post('https://'+config.domain+'/api/newGame', {
+    requestify.post(config.domain+'/api/newGame', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -180,7 +214,7 @@ function newGame(){
             io.sockets.emit('newGame', game);
             bot.handleOffers();
             preFinish = false;
-            requestify.post('https://'+config.domain+'/api/bonusBet', {
+            requestify.post(config.domain+'/api/bonusBet', {
                 secretKey: config.secretKey
             })
             .then(function(response) {
@@ -196,7 +230,7 @@ function newGame(){
 }
 
 function showSliderWinnersLottery(){
-    requestify.post('https://'+config.domain+'/api/getWinnersLottery', {
+    requestify.post(config.domain+'/api/getWinnersLottery', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -211,7 +245,7 @@ function showSliderWinnersLottery(){
         });
 }
 function showSliderWinners(){
-    requestify.post('https://'+config.domain+'/api/getWinners', {
+    requestify.post(config.domain+'/api/getWinners', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -227,7 +261,7 @@ function showSliderWinners(){
 }
 
 function setGameStatus(status){
-    requestify.post('https://'+config.domain+'/api/setGameStatus', {
+    requestify.post(config.domain+'/api/setGameStatus', {
         status: status,
         secretKey: config.secretKey
     })
