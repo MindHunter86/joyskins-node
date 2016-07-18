@@ -62,7 +62,8 @@ const redisChannels = {
 function steamBotLogger(log){
     console.tag('SteamBotDuel').log(log);
 }
-steamClient.connect()
+steamClient.connect();
+steamClient
     .on('debug', steamBotLogger)
     .on('connected', function() {
         steamUser.logOn(logOnOptions);
