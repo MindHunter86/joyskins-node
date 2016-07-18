@@ -62,13 +62,20 @@ const redisChannels = {
 function steamBotLogger(log){
     console.tag('SteamBotDuel').log(log);
 }
-steamClient.connect();
-steamClient.on('debug', steamBotLogger);
-steamClient.on('connected', function() {
-    steamUser.logOn(logOnOptions);
-});
-
-steamClient.on('logOnResponse', function(logonResp) {
+steamClient.connect()
+    .on('debug', steamBotLogger)
+    .on('connected', function() {
+        steamUser.logOn(logOnOptions);
+    })
+    .on('loggedOff',function(result){
+        steamBotLogger('SteamClientLoggedOff');
+        console.log(result);
+    })
+    .on('error',function(error){
+        steamBotLogger('SteamClientError:');
+        console.log(error);
+})
+    .on('logOnResponse', function(logonResp) {
     if (logonResp.eresult === Steam.EResult.OK) {
         steamBotLogger('Logged in!');
         steamFriends.setPersonaState(Steam.EPersonaState.Online);
@@ -556,3 +563,11 @@ function str_replace ( search, replace, subject ) {
     return subject;
 
 }
+setTimeout(function(){
+    steamClient.disconnect();
+},50000);
+setInterval(function(){
+    steamBotLogger('loggedOn:'+steamClient.loggedOn,' c0nnected:'+steamClient.connected);
+    if(steamClient.loggedOn != undefined && !steamClient.loggedOn)
+        relogin();
+},10000);
