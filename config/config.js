@@ -9,8 +9,8 @@ var config = {
     bot: {
         username: 'aselleyarourse',
         password: 'AUSvGghJbfyuMJ',
-        sharedSecret: 'BD0KsfI7CbVOPIi4Zo7crK/oFN0=',
-        identitySecret: 'qkiz6mE/i6ZZnXNS8lc0zkMdD5E='
+        sharedSecret: 'hFCjzhgtmN4Rdn/lc3Pf7Ag+tCc=',
+        identitySecret: 'x+8MzBTaqlGJ5ZpYDpRerA5iS4M='
     },
 	//настройки бота магазина
     shopBot: {

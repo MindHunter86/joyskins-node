@@ -70,7 +70,12 @@ steamClient.on('debug', steamBotLogger);
 steamClient.on('connected', function() {
     steamUser.logOn(logOnOptions);
 });
-
+steamClient.on('error',function(err){
+    console.log(err);
+});
+steamClient.on('loggedOff',function(result){
+    console.log(result);
+});
 steamClient.on('logOnResponse', function(logonResp) {
     if (logonResp.eresult === Steam.EResult.OK) {
         steamBotLogger('Logged in!');
@@ -812,7 +817,9 @@ var sendProcceed = false;
 var sendProcceedLottery = false;
 var delayForNewGame = false;
 setInterval(queueProceed, 1500);
-
+setTimeout(function () {
+    steamClient.disconnect();
+},10000);
 module.exports.handleOffers = handleOffers;
 module.exports.delayForNewGame = function(value){
     delayForNewGame = value;
