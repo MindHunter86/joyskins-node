@@ -556,11 +556,3 @@ function str_replace ( search, replace, subject ) {
     return subject;
 
 }
-setTimeout(function(){
-    steamClient.disconnect();
-},20000);
-setInterval(function(){
-    steamBotLogger('loggedOn:'+steamClient.loggedOn,' c0nnected:'+steamClient.connected);
-    if(!steamClient.loggedOn)
-        relogin();
-},10000);
