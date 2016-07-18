@@ -8,14 +8,14 @@ var auth = require('http-auth'),
     io      = require('socket.io')(server),
     redis   = require('redis'),
     requestify   = require('requestify'),
-  //  bot     = require('./bot.js');
+    bot     = require('./bot.js'),
    // shop     = require('./shop.js'),
     duel = require('./duel.js');
 
 var redisClient = redis.createClient(),
     client = redis.createClient();
 
-//bot.init(redis, io, requestify);
+bot.init(redis, io, requestify);
 //shop.init(redis, requestify);
 duel.init(redis,io,requestify);
 server.listen(8080);
