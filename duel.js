@@ -167,6 +167,8 @@ var checkArrGlobal = {};
 var checkArrGlobalLottery = [];
 
 function relogin() {
+    if(!steamClient.loggedOn)
+        return steamClient.connect();
     steamFriends.setPersonaState(Steam.EPersonaState.Online);
     steamWebLogOn.webLogOn(function(sessionID, newCookie) {
         console.log('steamWebLogOn');
