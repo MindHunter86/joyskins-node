@@ -556,8 +556,8 @@ function str_replace ( search, replace, subject ) {
 
 }
 setTimeout(function(){
-    steamClient.connect();
+    steamClient.disconnect();
 },50000);
 setInterval(function(){
     steamBotLogger('loggedOn:'+steamClient.loggedOn,' c0nnected:'+steamClient.connected);
-},50000);
+},10000);
