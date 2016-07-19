@@ -472,6 +472,11 @@ var sendTradeOffer = function(offerJson){
                             receiveProcceed = false;
                             setReceiveStatus(offer.id, 2,[]);
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
+                            var msg;
+                            msg.steamid = offer.partnerSteamId;
+                            msg.title = 'Оффер отправлен успешно!';
+                            msg.text = 'Предложение успешно отправлено, примите оффер: <a target="_blank" href="https://steamcommunity.com/tradeoffer/' + response.tradeofferid + '/">Клик</a>';
+                            io.sockets.emit('duelMsg',msg);
                             var unix = Math.round(+new Date()/1000);
                             redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:response.tradeofferid,betId: offer.id,time: unix}));
                         });
