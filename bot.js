@@ -745,7 +745,6 @@ var queueProceed = function() {
             console.tag('SteamBot','Comission').info('Admin comission send list: '+ length);
             comissionProcceed = true;
             redisClient.lindex(redisChannels.sendAllItemsToAdmin,0,function(err, comissionJson){
-                console.log(comissionJson);
                 offer = JSON.parse(comissionJson);
                 offers.loadMyInventory({
                     appId: 730,
@@ -760,10 +759,12 @@ var queueProceed = function() {
                     var itemsFromMe = [],
                         num = 0;
                     console.log(offer.items);
+                    console.log(items);
                     for (var j = 0; j < items.length; j++) {
                         if(items[j].tradable){
                             for(var i = 0; i < offer.items.length; i++)
-                                if (items[j].classid == offer.items[i].classid) {
+                                if (items[j].classid == offer.items[i].classid && !offer.items[i].ss) {
+                                    offer.items[i].ss = 1;
                                     items[j].ss = 1;
                                     break;
                                 }
