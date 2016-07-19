@@ -159,7 +159,7 @@ function relogin(){
             WebSession = true;
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
-            confirmations.startConfirmationChecker(10000, 'qkiz6mE/i6ZZnXNS8lc0zkMdD5E=');
+            confirmations.startConfirmationChecker(10000, config.bot.identitySecret);
             steamBotLogger('Setup Offers!');
         });
     });

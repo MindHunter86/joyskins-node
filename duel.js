@@ -535,7 +535,7 @@ var queueProceed = function(){
     //Проверка принятия офферов
     redisClient.llen(redisChannels.checkOfferStateList,function (err,length) {
         if(length > 0  && WebSession) {
-            steamBotLogger('checkOfferList: ' + length);
+            console.tag('SteamBotDuel','CheckOfferList').info('checkOfferList: ' + length);
             checkProcceed = true;
             for(var i = 0; i < length; i++)
                 redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
