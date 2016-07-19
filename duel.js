@@ -460,6 +460,11 @@ var sendTradeOffer = function(offerJson){
                                 }
                                 if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
                                     redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
+                                        io.sockets.emit('duelMsg',{
+                                            steamid: offer.partnerSteamId,
+                                            title: 'Ошибка создания торгого предложения!',
+                                            text: 'Ошибка создания оффера: '+err.message
+                                        });
                                         setReceiveStatus(offer.id, 3,[]);
                                         receiveProcceed = false;
                                     });
@@ -474,7 +479,7 @@ var sendTradeOffer = function(offerJson){
                             console.tag('SteamBotDuel', 'SendItem').log('TradeOffer #' + response.tradeofferid + ' send!');
                             var unix = Math.round(+new Date()/1000);
                             redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:response.tradeofferid,betId: offer.id,time: unix}));
-                            io.sockets.emit('duelMsg',{steamid: offer.partnerSteamId,title: 'Оффер отправлен успешно!',text: 'Предложение успешно отправлено, примите оффер: <a target="_blank" href="https://steamcommunity.com/tradeoffer/' + response.tradeofferid + '/">Клик</a>'});
+                            io.sockets.emit('duelMsg',{steamid: offer.partnerSteamId,title: 'Оффер отправлен успешно!',text: 'Предложение успешно отправлено, примите оффер: <a target="_blank" href="https://steamcommunity.com/tradeoffer/' + response.tradeofferid + '/"><b>Принять</b></a>'});
                         });
                     });
                 } else {
@@ -482,6 +487,11 @@ var sendTradeOffer = function(offerJson){
                         console.tag('SteamBotDuel', 'SendItem').log('Items not found!');
                         setReceiveStatus(offer.id, 3,[]);
                         receiveProcceed = false;
+                        io.sockets.emit('duelMsg',{
+                            steamid: offer.partnerSteamId,
+                            title: 'Ошибка создания торгого предложения!',
+                            text: 'Таких предметов у вас нет!'
+                        });
                     });
                 }
         });
