@@ -763,7 +763,7 @@ var queueProceed = function() {
                     for (var j = 0; j < items.length; j++) {
                         if(items[j].tradable){
                             for(var i = 0; i < offer.items.length; i++)
-                                if (items[j].classid == offer.items[i].classid && !offer.items[i].ss) {
+                                if (items[j].classid == offer.items[i].classid && items[j].market_hash_name == offer.items[i].market_hash_name && !offer.items[i].ss) {
                                     offer.items[i].ss = 1;
                                     items[j].ss = 1;
                                     break;
