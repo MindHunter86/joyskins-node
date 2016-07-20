@@ -14,10 +14,10 @@ var config = {
     },
 	//настройки бота магазина
     shopBot: {
-        username: '',
-        password: '',//
-        sharedSecret: '8z3EuTV1OuF13AyDVmQCpyLcz+I=',
-        identitySecret: 'Gz+2GzTeEzK3kRDTltiycctlVAE=',
+        username: 'romsdoto',
+        password: 'qwerrewq4',//
+        sharedSecret: 'H8VYNMyoC6FfFSe3THskTKx1HdM=',
+        identitySecret: 'WY22Lq7D5+K6lLc0rkA9gufMfgE=',
         timeForCancelOffer: 1800
     },
     //настройки дуэль бота
