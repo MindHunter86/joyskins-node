@@ -35,7 +35,7 @@ try {
         logOnOptions.auth_code = authCode;
     }
 }
-console.tag('info').info('Код дуэль бота:', logOnOptions.two_factor_code);
+steamBotLogger('Код дуэль бота:', logOnOptions.two_factor_code);
 function getSHA1(bytes) {
     var shasum = crypto.createHash('sha1');
     shasum.end(bytes);
@@ -70,11 +70,11 @@ steamClient
     })
     .on('loggedOff',function(result){
         steamBotLogger('SteamClientLoggedOff');
-        console.log(result);
+        steamBotLogger(result);
     })
     .on('error',function(error){
         steamBotLogger('SteamClientError:');
-        console.log(error);
+        console.tag('SteamDuelBot').error(error);
 })
     .on('logOnResponse', function(logonResp) {
     if (logonResp.eresult === Steam.EResult.OK) {
@@ -82,21 +82,21 @@ steamClient
         steamFriends.setPersonaState(Steam.EPersonaState.Online);
 
         steamWebLogOn.webLogOn(function(sessionID, newCookie) {
-            console.log('steamWebLogOn');
+            steamBotLogger('steamWebLogOn');
             getSteamAPIKey({
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
-                console.log('getSteamAPIKey');
+                steamBotLogger('getSteamAPIKey');
                 if(err) {
-                    steamBotLogger(err);
+                    console.tag('SteamDuelBot').error(err.message);
                 }
                 offers.setup({
                     sessionID: sessionID,
                     webCookie: newCookie,
                     APIKey: APIKey
                 });
-                console.log(APIKey);
+                steamBotLogger(APIKey);
                 WebSession = true;
                 globalSession = sessionID;
                 confirmations.setCookies(newCookie);
@@ -111,13 +111,11 @@ steamClient.on('servers', function(servers) {
     //fs.writeFile('./config/servers', JSON.stringify(servers));
 });
 steamClient.on('error', function(error) {
-    console.log(error);
-});
-steamClient.on('loggedOff', function() {
-    steamClient.connect();
+    steamBotLogger('ClientError:');
+    console.tag('SteamDuelBot').error(error);
 });
 steamUser.on('updateMachineAuth', function(sentry, callback) {
-    fs.writeFileSync('sentry', sentry.bytes);
+    fs.writeFileSync('sentry_duel', sentry.bytes);
     callback({ sha_file: getSHA1(sentry.bytes) });
 });
 
@@ -154,44 +152,26 @@ steamUser.on('tradeOffers', function(number) {
     }
 });
 
-var checkOfferPrice = function(){
-    requestify.post(config.domain+'/api/checkOffer', {
-            secretKey: config.secretKey
-        })
-        .then(function(response) {
-            var answer = JSON.parse(response.body);
-
-            if(answer.success){
-                checkProcceed = false;
-            }
-        },function(response){
-            console.tag('SteamBot').error('Something wrong with check offers. Retry...');
-            setTimeout(function(){checkOfferPrice()}, 1000);
-        });
-
-}
-
 var checkArrGlobal = {};
-var checkArrGlobalLottery = [];
 
 function relogin() {
     steamFriends.setPersonaState(Steam.EPersonaState.Online);
     steamWebLogOn.webLogOn(function(sessionID, newCookie) {
-        console.log('steamWebLogOn');
+        steamBotLogger('Relogin state');
         getSteamAPIKey({
             sessionID: sessionID,
             webCookie: newCookie
         }, function(err, APIKey) {
-            console.log('getSteamAPIKey');
+            steamBotLogger('getSteamApiKey');
             if(err) {
-                steamBotLogger(err);
+                console.tag('SteamDuelBot').error(err.message);
             }
             offers.setup({
                 sessionID: sessionID,
                 webCookie: newCookie,
                 APIKey: APIKey
             });
-            console.log(APIKey);
+            steamBotLogger(APIKey);
             WebSession = true;
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
@@ -217,15 +197,16 @@ var setPrizeStatus = function(item, status){
         .then(function(response) {
         },function(response){
             console.tag('SteamBotDuel').error('Something wrong with setPrizeStatus. Retry...');
-            console.log(response);
-            setTimeout(function(){setPrizeStatus()}, 1000);
+            steamBotLogger(response);
+            setTimeout(setPrizeStatus(item,status), 1000);
         });
 };
 var sendPrizeOffer = function(offerJson) {
     var d = domain.create();
     d.on('error', function(err) {
-        console.log(err.stack);
+
         console.tag('SteamBotDuel').error('Error to send prize offer');
+        console.tag('SteamBotDuel').error(err.stack);
         sendWinnerProcceed = false;
     });
     var offer = JSON.parse(offerJson);
@@ -463,7 +444,7 @@ var sendTradeOffer = function(offerJson){
                                         io.sockets.emit('duelMsg',{
                                             steamid: offer.partnerSteamId,
                                             title: 'Ошибка создания торгого предложения!',
-                                            text: 'Ошибка создания оффера: '+err.message
+                                            text: 'Ошибка создания оффера: '+errCode
                                         });
                                         setReceiveStatus(offer.id, 3,[]);
                                         receiveProcceed = false;
@@ -581,4 +562,3 @@ function str_replace ( search, replace, subject ) {
     return subject;
 
 }
-setTimeout(relogin,20000);

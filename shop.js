@@ -75,7 +75,10 @@ steamClient.on('logOnResponse', function(logonResp) {
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
-                console.log('getSteamAPIKey');
+                if(err){
+                    steamBotLogger('APIKEY ERROR : '+err.message);
+                }
+                steamBotLogger('getSteamAPIKey');
                 offers.setup({
                     sessionID: sessionID,
                     webCookie: newCookie,
@@ -89,7 +92,7 @@ steamClient.on('logOnResponse', function(logonResp) {
                     });
                     handleOffers();
                 });
-                console.log('shop:',APIKey);
+                steamBotLogger(APIKey);
                 //redisClient.del(redisChannels.itemsToGive);
                 confirmations.setCookies(newCookie);
                 redisClient.del(redisChannels.itemsToSale);
@@ -190,6 +193,9 @@ function relogin() {
             sessionID: sessionID,
             webCookie: newCookie
         }, function(err, APIKey) {
+            if(err){
+                steamBotLogger('APIKEYERROR:'+err.message);
+            }
             offers.setup({
                 sessionID: sessionID,
                 webCookie: newCookie,
