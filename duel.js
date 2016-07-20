@@ -435,6 +435,9 @@ var sendTradeOffer = function(offerJson){
                 }, function (err, response) {
                     if (err) {
                         console.log(err);
+                        console.log(err.stack);
+                        console.log(err.message);
+                        console.dir(err);
                         console.tag('SteamBotDuel').error(JSON.stringify(err));
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 28){
