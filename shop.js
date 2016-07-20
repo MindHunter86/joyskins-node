@@ -75,6 +75,9 @@ steamClient.on('logOnResponse', function(logonResp) {
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
+                if(err){
+                    steamBotLogger('APIKEY ERROR : '+err.message);
+                }
                 console.log('getSteamAPIKey');
                 offers.setup({
                     sessionID: sessionID,
@@ -190,6 +193,9 @@ function relogin() {
             sessionID: sessionID,
             webCookie: newCookie
         }, function(err, APIKey) {
+            if(err){
+                steamBotLogger('APIKEYERROR:'+err.message);
+            }
             offers.setup({
                 sessionID: sessionID,
                 webCookie: newCookie,
