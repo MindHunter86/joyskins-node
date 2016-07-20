@@ -434,7 +434,7 @@ var sendTradeOffer = function(offerJson){
                     message: 'Создание/Вступление в комнату на: ' + config.domain
                 }, function (err, response) {
                     if (err) {
-                        console.tag('SteamBotDuel').error(err);
+                        console.log(err);
                         console.tag('SteamBotDuel').error(JSON.stringify(err));
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 28){
@@ -446,7 +446,7 @@ var sendTradeOffer = function(offerJson){
                                         io.sockets.emit('duelMsg',{
                                             steamid: offer.partnerSteamId,
                                             title: 'Ошибка создания торгого предложения!',
-                                            text: 'Ошибка создания оффера: '+err.message
+                                            text: 'Ошибка создания оффера: '
                                         });
                                         setReceiveStatus(offer.id, 3,[]);
                                         receiveProcceed = false;
@@ -564,4 +564,3 @@ function str_replace ( search, replace, subject ) {
     return subject;
 
 }
-setTimeout(relogin,20000);
