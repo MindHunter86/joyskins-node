@@ -78,7 +78,7 @@ steamClient.on('logOnResponse', function(logonResp) {
                 if(err){
                     steamBotLogger('APIKEY ERROR : '+err.message);
                 }
-                console.log('getSteamAPIKey');
+                steamBotLogger('getSteamAPIKey');
                 offers.setup({
                     sessionID: sessionID,
                     webCookie: newCookie,
@@ -92,7 +92,7 @@ steamClient.on('logOnResponse', function(logonResp) {
                     });
                     handleOffers();
                 });
-                console.log('shop:',APIKey);
+                steamBotLogger(APIKey);
                 //redisClient.del(redisChannels.itemsToGive);
                 confirmations.setCookies(newCookie);
                 redisClient.del(redisChannels.itemsToSale);

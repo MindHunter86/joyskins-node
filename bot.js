@@ -82,9 +82,11 @@ steamClient.on('logOnResponse', function(logonResp) {
                 sessionID: sessionID,
                 webCookie: newCookie
             }, function(err, APIKey) {
-                console.log('getSteamAPIKey',APIKey);
+                steamBotLogger('getSteamAPIKey');
                 if(err) {
-                    steamBotLogger(err);
+                    steamBotLogger(err.message);
+                } else {
+                    steamBotLogger(APIKey);
                 }
                 offers.setup({
                     sessionID: sessionID,
