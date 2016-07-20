@@ -17,7 +17,8 @@ var redisClient = redis.createClient(),
 
 bot.init(redis, io, requestify);
 shop.init(redis, requestify);
-duel.init(redis,io,requestify);
+duel.init(redis, io, requestify);
+
 server.listen(8080);
 
 console.log('Server started on ' + config.domain + ':8080');
