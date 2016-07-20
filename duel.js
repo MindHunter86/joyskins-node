@@ -89,7 +89,7 @@ steamClient
             }, function(err, APIKey) {
                 steamBotLogger('getSteamAPIKey');
                 if(err) {
-                    console.tag('SteamDuelBot').error(err);
+                    console.tag('SteamDuelBot').error(err.message);
                 }
                 offers.setup({
                     sessionID: sessionID,
@@ -115,7 +115,7 @@ steamClient.on('error', function(error) {
     console.tag('SteamDuelBot').error(error);
 });
 steamUser.on('updateMachineAuth', function(sentry, callback) {
-    fs.writeFileSync('sentry', sentry.bytes);
+    fs.writeFileSync('sentry_duel', sentry.bytes);
     callback({ sha_file: getSHA1(sentry.bytes) });
 });
 
@@ -153,7 +153,6 @@ steamUser.on('tradeOffers', function(number) {
 });
 
 var checkArrGlobal = {};
-var checkArrGlobalLottery = [];
 
 function relogin() {
     steamFriends.setPersonaState(Steam.EPersonaState.Online);
@@ -165,7 +164,7 @@ function relogin() {
         }, function(err, APIKey) {
             steamBotLogger('getSteamApiKey');
             if(err) {
-                console.tag('SteamDuelBot').error(err);
+                console.tag('SteamDuelBot').error(err.message);
             }
             offers.setup({
                 sessionID: sessionID,
@@ -434,11 +433,7 @@ var sendTradeOffer = function(offerJson){
                     message: 'Создание/Вступление в комнату на: ' + config.domain
                 }, function (err, response) {
                     if (err) {
-                        console.log(err);
-                        console.log(err.stack);
-                        console.log(err.message);
-                        console.dir(err);
-                        console.tag('SteamBotDuel').error(JSON.stringify(err));
+                        console.tag('SteamBotDuel').error(err.message);
                             getErrorCode(err.message, function (errCode) {
                                 if (errCode == 28){
                                     receiveProcceed = false;
@@ -449,7 +444,7 @@ var sendTradeOffer = function(offerJson){
                                         io.sockets.emit('duelMsg',{
                                             steamid: offer.partnerSteamId,
                                             title: 'Ошибка создания торгого предложения!',
-                                            text: 'Ошибка создания оффера: '
+                                            text: 'Ошибка создания оффера: '+errCode
                                         });
                                         setReceiveStatus(offer.id, 3,[]);
                                         receiveProcceed = false;
