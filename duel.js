@@ -35,7 +35,7 @@ try {
         logOnOptions.auth_code = authCode;
     }
 }
-console.tag('info').info('Код дуэль бота:', logOnOptions.two_factor_code);
+steamBotLogger('Код дуэль бота:', logOnOptions.two_factor_code);
 function getSHA1(bytes) {
     var shasum = crypto.createHash('sha1');
     shasum.end(bytes);
