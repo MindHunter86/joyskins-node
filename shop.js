@@ -1,6 +1,3 @@
-setTimeout(function () {
-
-},10000);
 var fs = require('fs');
 var crypto = require('crypto');
 var console = process.console;
@@ -60,7 +57,8 @@ const redisChannels = {
 function steamBotLogger(log){
     console.tag('SteamBotShop').log(log);
 }
-steamClient.connect();
+
+setTimeout(function(){steamClient.connect();},15000);
 steamClient.on('debug', steamBotLogger);
 steamClient.on('connected', function() {
     steamUser.logOn(logOnOptions);
