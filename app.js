@@ -16,12 +16,8 @@ var redisClient = redis.createClient(),
     client = redis.createClient();
 
 bot.init(redis, io, requestify);
-setTimeout(function(){
-    shop.init(redis, requestify);
-    setTimeout(function() {
-        duel.init(redis, io, requestify);
-    },5000);
-},5000);
+shop.init(redis, requestify);
+duel.init(redis, io, requestify);
 
 server.listen(8080);
 

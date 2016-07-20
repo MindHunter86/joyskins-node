@@ -15,7 +15,7 @@ module.exports.init = function(redis, ioSocket, requestifyCore) {
     io = ioSocket;
     redisClient = redis.createClient();
     requestify = requestifyCore;
-}
+};
 
 var logOnOptions = {
     account_name: config.bot.username,
