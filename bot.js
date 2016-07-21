@@ -13,7 +13,7 @@ var domain = require('domain');
 var redisClient, io, requestify;
 module.exports.init = function(redis, ioSocket, requestifyCore) {
     io = ioSocket;
-    redisClient = redis.createClient();
+    redisClient = redis.createClient(config.redisPort,config.redisIp);
     requestify = requestifyCore;
 };
 
@@ -170,7 +170,7 @@ function addQueue(steamid, count) {
     counts = 0;
     responses = [];
     var send = function() { 
-        requestify.post(config.domain+'/api/userqueue', {
+        requestify.post(config.protocol+config.domain+'/api/userqueue', {
             secretKey: config.secretKey,
             action: 'queueUser',
             id: steamid[counts]
@@ -346,7 +346,7 @@ var parseOffer = function(offer, offerJson) {
 }
 
 var checkOfferPrice = function(){
-    requestify.post(config.domain+'/api/checkOffer', {
+    requestify.post(config.protocol+config.domain+'/api/checkOffer', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -363,7 +363,7 @@ var checkOfferPrice = function(){
 }
 
 var checkNewBet = function(){
-    requestify.post(config.domain+'/api/newBet', {
+    requestify.post(config.protocol+config.domain+'/api/newBet', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -584,7 +584,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
 };
 
 var setPrizeStatus = function(game, status){
-    requestify.post(config.domain+'/api/setPrizeStatus', {
+    requestify.post(config.protocol+config.domain+'/api/setPrizeStatus', {
         secretKey: config.secretKey,
         game: game,
         status: status
@@ -606,7 +606,8 @@ var is_checkingOfferExists = function(tradeofferid){
         }
     }
     return false;
-}
+};
+
 
 var checkedOffersProcceed = function(offerJson){
     var d = domain.create();
@@ -635,7 +636,7 @@ var checkedOffersProcceed = function(offerJson){
                         });
 
                 } else {
-                    console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid);
+                    console.tag('SteamBot').error('Error. With accept tradeoffer #',offer.offerid,err.message);
                     console.tag('SteamBot').error(err.message);
                     offers.getOffer({tradeOfferId: offer.offerid}, function (err, body){
                         if(err) {
@@ -645,6 +646,8 @@ var checkedOffersProcceed = function(offerJson){
                         if(body.response.offer){
                             var offerCheck = body.response.offer;
                             if(offerCheck.trade_offer_state == 2) {
+                                console.tag('SteamBot').log('Try again to accept');
+                                return checkedOffersProcceed(offerJson);
                                 redisClient.multi([
                                     ["lrem", redisChannels.tradeoffersList, 0, offer.offerid],
                                     ["lrem", redisChannels.usersQueue, 0, offer.steamid64],
@@ -692,7 +695,7 @@ var checkedOffersProcceed = function(offerJson){
             });
         }
     });
-}
+};
 
 var declineOffersProcceed = function(offerid){
     console.tag('SteamBot').log('Procceding decline: #' + offerid);
