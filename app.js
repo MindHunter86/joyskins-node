@@ -12,8 +12,8 @@ var auth = require('http-auth'),
     shop     = require('./shop.js'),
     duel = require('./duel.js');
 
-var redisClient = redis.createClient(),
-    client = redis.createClient();
+var redisClient = redis.createClient(config.redisPort,config.redisIp),
+    client = redis.createClient(config.redisPort,config.redisIp);
 
 bot.init(redis, io, requestify);
 shop.init(redis, requestify);
@@ -164,7 +164,7 @@ function startNGTimer(winners){
     }, 1000);
 }
 function finishDuelRoom(item){
-    requestify.post(config.domain+'/api/duel/finishRoom', {
+    requestify.post(config.protocol+config.domain+'/api/duel/finishRoom', {
             id: item,
             secretKey: config.secretKey
         })
@@ -175,7 +175,7 @@ function finishDuelRoom(item){
         });
 }
 function getCurrentGame(){
-    requestify.post(config.domain+'/api/getCurrentGame', {
+    requestify.post(config.protocol+config.domain+'/api/getCurrentGame', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -191,7 +191,7 @@ function getCurrentGame(){
         });
 }
 function newLottery(){
-    requestify.post(config.domain+'/api/newLottery', {
+    requestify.post(config.protocol+config.domain+'/api/newLottery', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -206,7 +206,7 @@ function newLottery(){
         });
 }
 function newGame(){
-    requestify.post(config.domain+'/api/newGame', {
+    requestify.post(config.protocol+config.domain+'/api/newGame', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -215,7 +215,7 @@ function newGame(){
             io.sockets.emit('newGame', game);
             bot.handleOffers();
             preFinish = false;
-            requestify.post(config.domain+'/api/bonusBet', {
+            requestify.post(config.protocol+config.domain+'/api/bonusBet', {
                 secretKey: config.secretKey
             })
             .then(function(response) {
@@ -231,7 +231,7 @@ function newGame(){
 }
 
 function showSliderWinnersLottery(){
-    requestify.post(config.domain+'/api/getWinnersLottery', {
+    requestify.post(config.protocol+config.domain+'/api/getWinnersLottery', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -246,7 +246,7 @@ function showSliderWinnersLottery(){
         });
 }
 function showSliderWinners(){
-    requestify.post(config.domain+'/api/getWinners', {
+    requestify.post(config.protocol+config.domain+'/api/getWinners', {
         secretKey: config.secretKey
     })
         .then(function(response) {
@@ -262,7 +262,7 @@ function showSliderWinners(){
 }
 
 function setGameStatus(status){
-    requestify.post(config.domain+'/api/setGameStatus', {
+    requestify.post(config.protocol+config.domain+'/api/setGameStatus', {
         status: status,
         secretKey: config.secretKey
     })

@@ -13,7 +13,7 @@ var confirmations = new SteamCommunity();
 
 var redisClient, requestify;
 module.exports.init = function(redis, requestifyCore) {
-    redisClient = redis.createClient();
+    redisClient = redis.createClient(config.redisPort,config.redisIp);
     requestify = requestifyCore;
 }
 
@@ -58,7 +58,7 @@ function steamBotLogger(log){
     console.tag('SteamBotShop').log(log);
 }
 
-setTimeout(function(){steamClient.connect();},25000);
+steamClient.connect();
 steamClient.on('debug', steamBotLogger);
 steamClient.on('connected', function() {
     steamUser.logOn(logOnOptions);
@@ -288,7 +288,7 @@ var sendTradeOffer = function(offerJson){
 
 
 var setItemStatus = function(item, status){
-    requestify.post(config.domain+'/api/shop/setItemStatus', {
+    requestify.post(config.protocol+config.domain+'/api/shop/setItemStatus', {
         secretKey: config.secretKey,
         id: item,
         status: status
@@ -301,7 +301,7 @@ var setItemStatus = function(item, status){
 }
 
 var addNewItems = function(){
-    requestify.post(config.domain+'/api/shop/newItems', {
+    requestify.post(config.protocol+config.domain+'/api/shop/newItems', {
         secretKey: config.secretKey
     })
         .then(function(response) {

@@ -5,6 +5,8 @@ Config file
 var config = {
     serverPort: 80,
     prefix: '',
+    redisPort: 6379,
+    redisIp: '127.0.0.1',
 	//настройка бота рулетки
     bot: {
         username: 'baidalenedal',
@@ -28,7 +30,8 @@ var config = {
         identitySecret: 'x+8MzBTaqlGJ5ZpYDpRerA5iS4M='
     },
     apiKey: '89638B050C0254D97337012787F57F68',	//steam api key
-    domain: 'https://joyskins.top',	//домен сайта
+    domain: 'joyskins.top',	//домен сайта
+    protocol: 'https://',
     secretKey: 'GDDrHk76e2n8kwcYtLrbht9ETg2yGC3L',
     
     admins: [	//steam id админов

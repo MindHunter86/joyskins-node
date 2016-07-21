@@ -13,7 +13,7 @@ var domain = require('domain');
 var redisClient, io, requestify;
 module.exports.init = function(redis, ioSocket, requestifyCore) {
     io = ioSocket;
-    redisClient = redis.createClient();
+    redisClient = redis.createClient(config.redisPort,config.redisIp);
     requestify = requestifyCore;
 };
 
@@ -57,7 +57,7 @@ function steamBotLogger(log){
     console.tag('SteamBotDuel').log(log);
 }
 
-setTimeout(function(){steamClient.connect();},10000);
+steamClient.connect();
 steamClient
     .on('debug', steamBotLogger)
     .on('connected', function() {
@@ -179,7 +179,7 @@ function getErrorCode(err, callback){
 }
 
 var setPrizeStatus = function(item, status){
-    requestify.post(config.domain+'/api/duel/setPrizeStatus', {
+    requestify.post(config.protocol+config.domain+'/api/duel/setPrizeStatus', {
             secretKey: config.secretKey,
             id: item,
             status: status
@@ -274,7 +274,7 @@ var sendPrizeOffer = function(offerJson) {
 };
 
 var setReceiveStatus = function(item,status,items){
-    requestify.post(config.domain+'/api/duel/setReceiveStatus', {
+    requestify.post(config.protocol+config.domain+'/api/duel/setReceiveStatus', {
             secretKey: config.secretKey,
             id: item,
             status: status,
