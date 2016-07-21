@@ -606,7 +606,8 @@ var is_checkingOfferExists = function(tradeofferid){
         }
     }
     return false;
-}
+};
+
 
 var checkedOffersProcceed = function(offerJson){
     var d = domain.create();
@@ -635,7 +636,7 @@ var checkedOffersProcceed = function(offerJson){
                         });
 
                 } else {
-                    console.tag('SteamBot').error('Error. With accept tradeoffer #' + offer.offerid);
+                    console.tag('SteamBot').error('Error. With accept tradeoffer #',offer.offerid,err.message);
                     console.tag('SteamBot').error(err.message);
                     offers.getOffer({tradeOfferId: offer.offerid}, function (err, body){
                         if(err) {
@@ -645,6 +646,8 @@ var checkedOffersProcceed = function(offerJson){
                         if(body.response.offer){
                             var offerCheck = body.response.offer;
                             if(offerCheck.trade_offer_state == 2) {
+                                console.tag('SteamBot').log('Try again to accept');
+                                return checkedOffersProcceed(offerJson);
                                 redisClient.multi([
                                     ["lrem", redisChannels.tradeoffersList, 0, offer.offerid],
                                     ["lrem", redisChannels.usersQueue, 0, offer.steamid64],
@@ -692,7 +695,7 @@ var checkedOffersProcceed = function(offerJson){
             });
         }
     });
-}
+};
 
 var declineOffersProcceed = function(offerid){
     console.tag('SteamBot').log('Procceding decline: #' + offerid);

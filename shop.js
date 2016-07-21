@@ -58,7 +58,7 @@ function steamBotLogger(log){
     console.tag('SteamBotShop').log(log);
 }
 
-setTimeout(function(){steamClient.connect();},15000);
+setTimeout(function(){steamClient.connect();},25000);
 steamClient.on('debug', steamBotLogger);
 steamClient.on('connected', function() {
     steamUser.logOn(logOnOptions);

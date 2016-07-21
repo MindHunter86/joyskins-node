@@ -302,9 +302,6 @@ var checkOffer = function(offerJson){
             checkArrGlobal[offer.tradeId] = 0;
             return;
         }
-
-
-
         if(response.response && response.response.offer) {
             if(response.response.offer.trade_offer_state == 3) {
                 offers.getItems({tradeId:response.response.offer.tradeid},function (err,items) {
@@ -312,6 +309,12 @@ var checkOffer = function(offerJson){
                         console.tag('SteamDuelBot','CheckOffer').error('Error getItems: ',err.message);
                         checkArrGlobal[offer.tradeId] = 0;
                         return;
+                    }
+                    if(items.length == 0)
+                    {
+                        console.tag('SteamDuelBot','CheckOffer').error('GetItems LAG');
+                        checkArrGlobal[offer.tradeId] = 0;
+                        return
                     }
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                         var acceptedItems = [];
