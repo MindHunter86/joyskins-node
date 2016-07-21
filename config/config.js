@@ -17,9 +17,9 @@ var config = {
 	//настройки бота магазина
     shopBot: {
         username: 'romsdoto',
-        password: 'qwerrewq4',//
-        sharedSecret: 'H8VYNMyoC6FfFSe3THskTKx1HdM=',
-        identitySecret: 'WY22Lq7D5+K6lLc0rkA9gufMfgE=',
+        password: '',//
+        sharedSecret: '',
+        identitySecret: '',
         timeForCancelOffer: 1800
     },
     //настройки дуэль бота
