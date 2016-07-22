@@ -487,16 +487,17 @@ var queueProceed = function(){
     //Проверка принятия офферов
     redisClient.llen(redisChannels.checkOfferStateList,function (err,length) {
         if(length > 0  && WebSession) {
-            console.tag('SteamBotDuel','CheckOfferList').info('checkOfferList: ' + length);
+            console.tag('SteamBotDuel', 'CheckOfferList').info('checkOfferList: ' + length);
             checkProcceed = true;
-            for(var i = 0; i < length; i++)
-                redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
-                    if(err){
+            for (var i = 0; i < length; i++)
+                redisClient.lrange(redisChannels.checkOfferStateList, 0, -1, function (err, offerJson) {
+                    if (err) {
                         console.tag('SteamBotDuel').error(err.stack);
                         return;
                     }
                     checkOffer(offerJson);
                 });
+
         }
     });
 }
