@@ -327,6 +327,7 @@ var checkOffer = function(offerJson){
                         });
                         setReceiveStatus(offer.betId,1,acceptedItems);
                         checkArrGlobal[offer.tradeId] = 0;
+                        return;
                     });
                 });
             } else if(response.response.offer.trade_offer_state != 2) {
@@ -344,17 +345,15 @@ var checkOffer = function(offerJson){
                 if(unix-offer.time > 90)
                 {
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-                        setReceiveStatus(offer.betId,4,[]);
                         offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                            setReceiveStatus(offer.betId,4,[]);
+                            checkArrGlobal[offer.tradeId] = 0;
                         });
-                        checkArrGlobal[offer.tradeId] = 0;
                     });
                     return;
-                }
-                checkArrGlobal[offer.tradeId] = 0;
+                } else checkArrGlobal[offer.tradeId] = 0;
                 return;
             }
-
         } else {
             console.tag('SteamBotDuel').log('Error on get offer response: ',offer.betId);
             checkArrGlobal[offer.tradeId] = 0;
