@@ -239,7 +239,7 @@ var sendPrizeOffer = function(offerJson) {
                         if (err) {
                             console.tag('SteamBotDuel').error('offer.id :',offer.id,err.message);
                             getErrorCode(err.message, function (errCode) {
-                                if (errCode == 28)
+                                if (errCode == 28 || errCode == 20)
                                 {
                                     sendWinnerProcceed = false;
                                     return;
@@ -327,6 +327,7 @@ var checkOffer = function(offerJson){
                         });
                         setReceiveStatus(offer.betId,1,acceptedItems);
                         checkArrGlobal[offer.tradeId] = 0;
+                        return;
                     });
                 });
             } else if(response.response.offer.trade_offer_state != 2) {
@@ -344,17 +345,15 @@ var checkOffer = function(offerJson){
                 if(unix-offer.time > 90)
                 {
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-                        setReceiveStatus(offer.betId,4,[]);
                         offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                            setReceiveStatus(offer.betId,4,[]);
+                            checkArrGlobal[offer.tradeId] = 0;
                         });
-                        checkArrGlobal[offer.tradeId] = 0;
                     });
                     return;
-                }
-                checkArrGlobal[offer.tradeId] = 0;
+                } else checkArrGlobal[offer.tradeId] = 0;
                 return;
             }
-
         } else {
             console.tag('SteamBotDuel').log('Error on get offer response: ',offer.betId);
             checkArrGlobal[offer.tradeId] = 0;
@@ -420,7 +419,7 @@ var sendTradeOffer = function(offerJson){
                     if (err) {
                         console.tag('SteamBotDuel','SendTrade').error('MakeOffer error: ',err.message);
                         getErrorCode(err.message, function (errCode) {
-                            if (errCode == 28){
+                            if (errCode == 28 || errCode == 20){
                                 receiveProcceed = false;
                                 return;
                             }
@@ -492,6 +491,10 @@ var queueProceed = function(){
             checkProcceed = true;
             for(var i = 0; i < length; i++)
                 redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
+                    if(err){
+                        console.tag('SteamBotDuel').error(err.stack);
+                        return;
+                    }
                     checkOffer(offerJson);
                 });
         }

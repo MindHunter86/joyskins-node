@@ -438,7 +438,7 @@ var sendTradeOfferLottery = function(appId, partnerSteamId, accessToken, sendIte
                 }, function (err, response) {
                     if (err) {
                         console.tag('SteamBot','LotterySend').error(err.message);
-                        if(err.message.indexOf('(28)') != -1)
+                        if(err.message.indexOf('(28)') != -1 || err.message.indexOf('(20)') != -1)
                         {
                             sendProcceedLottery = false;
                             return;
@@ -541,7 +541,7 @@ var sendTradeOffer = function(appId, partnerSteamId, accessToken, sendItems, mes
                 }, function (err, response) {
                     if (err) {
                         console.tag('SteamBot','sendTrade').error(err.message);
-                        if(err.message.indexOf('(28)') != -1)
+                        if(err.message.indexOf('(28)') != -1 || err.message.indexOf('(20)') != -1)
                         {
                             sendProcceed = false;
                             return;
@@ -794,7 +794,7 @@ var queueProceed = function() {
                         }, function (err, response) {
                             if (err) {
                                 console.tag('SteamBot','Comission').error(err.message);
-                                if(err.message.indexOf('(28)') != -1)
+                                if(err.message.indexOf('(28)') != -1 || err.message.indexOf('(20)') != -1)
                                 {
                                     comissionProcceed = false;
                                     return;
