@@ -239,7 +239,7 @@ var sendPrizeOffer = function(offerJson) {
                         if (err) {
                             console.tag('SteamBotDuel').error('offer.id :',offer.id,err.message);
                             getErrorCode(err.message, function (errCode) {
-                                if (errCode == 28)
+                                if (errCode == 28 || errCode == 20)
                                 {
                                     sendWinnerProcceed = false;
                                     return;
@@ -419,7 +419,7 @@ var sendTradeOffer = function(offerJson){
                     if (err) {
                         console.tag('SteamBotDuel','SendTrade').error('MakeOffer error: ',err.message);
                         getErrorCode(err.message, function (errCode) {
-                            if (errCode == 28){
+                            if (errCode == 28 || errCode == 20){
                                 receiveProcceed = false;
                                 return;
                             }
