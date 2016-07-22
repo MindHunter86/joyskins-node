@@ -491,6 +491,10 @@ var queueProceed = function(){
             checkProcceed = true;
             for(var i = 0; i < length; i++)
                 redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
+                    if(err){
+                        console.tag('SteamBotDuel').error(err.stack);
+                        return;
+                    }
                     checkOffer(offerJson);
                 });
         }
