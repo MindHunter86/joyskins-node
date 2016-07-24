@@ -212,26 +212,28 @@ var sendPrizeOffer = function(offerJson) {
             }
             var itemsFromMe = [];
             offer.items.forEach(function (item) {
-                itemsFromMe.push({
-                    appid: 730,
-                    contextid: 2,
-                    amount: 1,
-                    assetid: item.id
-                });
-                /*
-                for(var i=0; i < items.length; i++)
-                {
-                    if(items[i].id == item.id)
+                if(!offer.typeSend) {
+                    itemsFromMe.push({
+                        appid: 730,
+                        contextid: 2,
+                        amount: 1,
+                        assetid: item.id
+                    });
+                } else {
+                    for(var i=0; i < items.length; i++)
                     {
-                        itemsFromMe.push({
-                            appid: 730,
-                            contextid: 2,
-                            amount: items[i].amount,
-                            assetid: items[i].id
-                        });
-                        return;
+                        if(items[i].id == item.id)
+                        {
+                            itemsFromMe.push({
+                                appid: 730,
+                                contextid: 2,
+                                amount: items[i].amount,
+                                assetid: items[i].id
+                            });
+                            return;
+                        }
                     }
-                }*/
+                }
             });
             if(offer.items.length == itemsFromMe.length || offer.items.length-2 <= itemsFromMe.length) {
                 console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
