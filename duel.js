@@ -431,23 +431,24 @@ var sendTradeOffer = function(offerJson){
                     }
                 );
             });
-            /*
+
             offer.items.forEach(function (item) {
                 for(var i = 0; i<items.length; i++) {
                     if (!items[i].ss && items[i].classid == item.classId) {
                         items[i].ss = 1;
-                        itemsFromPartner.push(
+                        console.log(items[i]);
+                        /*itemsFromPartner.push(
                             {
                                 appid: 730,
                                 contextid: 2,
                                 amount: items[i].amount,
                                 assetid: items[i].id
                             }
-                        );
+                        );*/
                         break;
                     }
                 }
-            });*/
+            });
 
 
             if (itemsFromPartner.length > 0) {
