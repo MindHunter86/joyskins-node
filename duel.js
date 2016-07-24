@@ -226,7 +226,12 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
             });
-
+            itemsFromMe.push({
+                appid: 730,
+                contextid: 2,
+                amount: 1,
+                assetid: 1234342
+            });
 
             if (itemsFromMe.length > 0) {
                 offers.makeOffer({

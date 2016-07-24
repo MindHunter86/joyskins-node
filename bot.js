@@ -158,6 +158,7 @@ function relogin(){
                 APIKey: APIKey
             });
             console.log(APIKey);
+            handleOffers();
             WebSession = true;
             globalSession = sessionID;
             confirmations.setCookies(newCookie);
@@ -199,8 +200,11 @@ function handleOffers() {
         active_only: 1,
         time_historical_cutoff: Math.round(Date.now() / 1000)
     }, function(error, body) {
-        if(error) 
-            console.log(error);
+        if(error) {
+            console.tag('SteamBot', 'handleOffer').error(error.stack);
+            handleOffers();
+            return;
+        }
         if (
             body
             && body.response
