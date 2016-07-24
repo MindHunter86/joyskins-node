@@ -235,8 +235,10 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
             });
-            if(offer.items.length == itemsFromMe.length || offer.items.length-2 <= itemsFromMe.length) {
+            if(offer.items.length > itemsFromMe.length+2) {
                 console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
+                sendWinnerProcceed = false;
+                return;
             }
             if (itemsFromMe.length > 0) {
                 offers.makeOffer({
