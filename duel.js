@@ -367,8 +367,13 @@ var checkOffer = function(offerJson){
                 var unix = Math.round(+new Date()/1000);
                 if(unix-offer.time > 90)
                 {
-                    redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-                        offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                    offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                        if(err){
+                            console.tag('SteamBotDuel').error('timeout canceloffer error:',err.message);
+                            checkArrGlobal[offer.tradeId] = 0;
+                            return;
+                        }
+                        redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                             steamBotLogger('BetId:'+offer.betId+':timeout');
                             setReceiveStatus(offer.betId,4,[]);
                             checkArrGlobal[offer.tradeId] = 0;
