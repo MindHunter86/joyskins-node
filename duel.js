@@ -45,7 +45,8 @@ var offers = new SteamTradeOffers();
 
 var checkingOffers = [],
     WebSession = false,
-    globalSession;
+    globalSession,
+    sendTradeRetries = 0;
 
 const redisChannels = {
     receiveBetItems: config.prefix + 'receiveBetItems.list',
@@ -235,10 +236,19 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
             });
-            if(offer.items.length > itemsFromMe.length+2) {
+            if(offer.items.length > itemsFromMe.length+2 && offer.typeSend) {
                 console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
-                sendWinnerProcceed = false;
-                return;
+                if(sendTradeRetries > 5) {
+                    redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                        setPrizeStatus(offer.id, 2);
+                        sendWinnerProcceed = false;
+                    });
+                    return;
+                } else {
+                    sendTradeRetries++;
+                    sendWinnerProcceed = false;
+                    return;
+                }
             }
             if (itemsFromMe.length > 0) {
                 offers.makeOffer({
