@@ -45,7 +45,8 @@ var offers = new SteamTradeOffers();
 
 var checkingOffers = [],
     WebSession = false,
-    globalSession;
+    globalSession,
+    sendTradeRetries = 0;
 
 const redisChannels = {
     receiveBetItems: config.prefix + 'receiveBetItems.list',
@@ -211,23 +212,43 @@ var sendPrizeOffer = function(offerJson) {
             }
             var itemsFromMe = [];
             offer.items.forEach(function (item) {
-                for(var i=0; i < items.length; i++)
-                {
-                    if(!items[i].ss && items[i].id == item.id)
+                if(!offer.typeSend) {
+                    itemsFromMe.push({
+                        appid: 730,
+                        contextid: 2,
+                        amount: 1,
+                        assetid: item.id
+                    });
+                } else {
+                    for(var i=0; i < items.length; i++)
                     {
-                        items[i].ss = 1;
-                        itemsFromMe.push({
-                            appid: 730,
-                            contextid: 2,
-                            amount: items[i].amount,
-                            assetid: items[i].id
-                        });
-                        break;
+                        if(items[i].id == item.id)
+                        {
+                            itemsFromMe.push({
+                                appid: 730,
+                                contextid: 2,
+                                amount: items[i].amount,
+                                assetid: items[i].id
+                            });
+                            return;
+                        }
                     }
                 }
             });
-
-
+            if(offer.items.length > itemsFromMe.length+2 && offer.typeSend) {
+                console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
+                if(sendTradeRetries > 5) {
+                    redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                        setPrizeStatus(offer.id, 2);
+                        sendWinnerProcceed = false;
+                    });
+                    return;
+                } else {
+                    sendTradeRetries++;
+                    sendWinnerProcceed = false;
+                    return;
+                }
+            }
             if (itemsFromMe.length > 0) {
                 offers.makeOffer({
                     partnerSteamId: offer.partnerSteamId,
@@ -318,6 +339,7 @@ var checkOffer = function(offerJson){
                     }
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                         var acceptedItems = [];
+                        steamBotLogger('BetId:'+offer.betId+':accepted');
                         items.forEach(function (item) {
                             acceptedItems.push({
                                 market_hash_name: item.market_hash_name,
@@ -332,6 +354,7 @@ var checkOffer = function(offerJson){
                 });
             } else if(response.response.offer.trade_offer_state != 2) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+                    steamBotLogger('BetId:'+offer.betId+':declineState');
                     setReceiveStatus(offer.betId,4,[]);
                     if(response.response.offer.trade_offer_state != 6 && response.response.offer.trade_offer_state != 7) {
                         offers.cancelOffer({tradeOfferId: offer.tradeofferid},function(err,res){
@@ -344,8 +367,14 @@ var checkOffer = function(offerJson){
                 var unix = Math.round(+new Date()/1000);
                 if(unix-offer.time > 90)
                 {
-                    redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
-                        offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                    offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                        if(err){
+                            console.tag('SteamBotDuel').error('timeout canceloffer error:',err.message);
+                            checkArrGlobal[offer.tradeId] = 0;
+                            return;
+                        } else
+                        redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+                            steamBotLogger('BetId:'+offer.betId+':timeout');
                             setReceiveStatus(offer.betId,4,[]);
                             checkArrGlobal[offer.tradeId] = 0;
                         });
@@ -375,38 +404,17 @@ var sendTradeOffer = function(offerJson){
     });
     d.run(function(){
         var offer = JSON.parse(offerJson);
-        offers.loadPartnerInventory({
-            partnerSteamId: offer.partnerSteamId,
-            contextId: 2,
-            appId: 730
-        }, function (err, items) {
-            if(err) {
-                console.tag('SteamBotDuel', 'SendTrade').error('LoadPartnerInventory error!',err.message);
-                redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                    setReceiveStatus(offer.id, 3,[]);
-                    receiveProcceed = false;
-                });
-                return;
-            }
-
             var itemsFromPartner = [];
-            offer.items.forEach(function (item) {
-                for(var i = 0; i<items.length; i++) {
-                    if (!items[i].ss && items[i].classid == item.classId) {
-                        items[i].ss = 1;
-                        itemsFromPartner.push(
-                            {
-                                appid: 730,
-                                contextid: 2,
-                                amount: items[i].amount,
-                                assetid: items[i].id
-                            }
-                        );
-                        break;
+            offer.items.forEach(function(item){
+                itemsFromPartner.push(
+                    {
+                        appid: 730,
+                        contextid: 2,
+                        amount: 1,
+                        assetid: item.id.toString()
                     }
-                }
+                );
             });
-
 
             if (itemsFromPartner.length > 0) {
                 offers.makeOffer({
@@ -414,7 +422,7 @@ var sendTradeOffer = function(offerJson){
                     accessToken: offer.accessToken,
                     itemsFromMe: [],
                     itemsFromThem: itemsFromPartner,
-                    message: 'Создание/Вступление в комнату на: ' + config.domain
+                    message: 'Создание/Вступление номер ставки: ' + offer.id
                 }, function (err, response) {
                     if (err) {
                         console.tag('SteamBotDuel','SendTrade').error('MakeOffer error: ',err.message);
@@ -459,7 +467,6 @@ var sendTradeOffer = function(offerJson){
                     });
                 });
             }
-        });
     });
 };
 
@@ -487,7 +494,6 @@ var queueProceed = function(){
     //Проверка принятия офферов
     redisClient.llen(redisChannels.checkOfferStateList,function (err,length) {
         if(length > 0  && WebSession) {
-            console.tag('SteamBotDuel','CheckOfferList').info('checkOfferList: ' + length);
             checkProcceed = true;
             for(var i = 0; i < length; i++)
                 redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
@@ -503,7 +509,7 @@ var queueProceed = function(){
 var receiveProcceed = false;
 var sendWinnerProcceed = false;
 var checkProcceed = false;
-setInterval(queueProceed, 1500);
+setInterval(queueProceed, 3000);
 function str_replace ( search, replace, subject ) {
     if(!(replace instanceof Array)){
         replace=new Array(replace);
