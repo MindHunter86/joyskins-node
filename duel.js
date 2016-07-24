@@ -368,11 +368,12 @@ var checkOffer = function(offerJson){
                 if(unix-offer.time > 90)
                 {
                     offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                        console.log(res);
                         if(err){
                             console.tag('SteamBotDuel').error('timeout canceloffer error:',err.message);
                             checkArrGlobal[offer.tradeId] = 0;
                             return;
-                        }
+                        } else
                         redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                             steamBotLogger('BetId:'+offer.betId+':timeout');
                             setReceiveStatus(offer.betId,4,[]);
@@ -531,7 +532,7 @@ var queueProceed = function(){
 var receiveProcceed = false;
 var sendWinnerProcceed = false;
 var checkProcceed = false;
-setInterval(queueProceed, 1500);
+setInterval(queueProceed, 3000);
 function str_replace ( search, replace, subject ) {
     if(!(replace instanceof Array)){
         replace=new Array(replace);
