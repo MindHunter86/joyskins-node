@@ -420,6 +420,17 @@ var sendTradeOffer = function(offerJson){
             }
 
             var itemsFromPartner = [];
+            offer.items.forEach(function(item){
+                itemsFromPartner.push(
+                    {
+                        appid: 730,
+                        contextid: 2,
+                        amount: 1,
+                        assetid: item.id
+                    }
+                );
+            });
+            /*
             offer.items.forEach(function (item) {
                 for(var i = 0; i<items.length; i++) {
                     if (!items[i].ss && items[i].classid == item.classId) {
@@ -435,7 +446,7 @@ var sendTradeOffer = function(offerJson){
                         break;
                     }
                 }
-            });
+            });*/
 
 
             if (itemsFromPartner.length > 0) {
