@@ -421,6 +421,7 @@ var sendTradeOffer = function(offerJson){
 
             var itemsFromPartner = [];
             offer.items.forEach(function(item){
+                console.log(item);
                 itemsFromPartner.push(
                     {
                         appid: 730,
