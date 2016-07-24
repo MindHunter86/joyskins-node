@@ -204,7 +204,6 @@ var sendPrizeOffer = function(offerJson) {
             appId: 730,
             contextId: 2
         }, function (err, items) {
-            console.log('MakeOffer Items LENGTH:',items.length);
             if(err) {
                 console.tag('SteamBotDuel', 'SendTrade').error('LoadMyInventory error: ',err.message);
                 relogin();
@@ -340,6 +339,7 @@ var checkOffer = function(offerJson){
                     }
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                         var acceptedItems = [];
+                        steamBotLogger('BetId:'+offer.betId+':accepted');
                         items.forEach(function (item) {
                             acceptedItems.push({
                                 market_hash_name: item.market_hash_name,
@@ -354,6 +354,7 @@ var checkOffer = function(offerJson){
                 });
             } else if(response.response.offer.trade_offer_state != 2) {
                 redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
+                    steamBotLogger('BetId:'+offer.betId+':declineState');
                     setReceiveStatus(offer.betId,4,[]);
                     if(response.response.offer.trade_offer_state != 6 && response.response.offer.trade_offer_state != 7) {
                         offers.cancelOffer({tradeOfferId: offer.tradeofferid},function(err,res){
@@ -368,6 +369,7 @@ var checkOffer = function(offerJson){
                 {
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                         offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
+                            steamBotLogger('BetId:'+offer.betId+':timeout');
                             setReceiveStatus(offer.betId,4,[]);
                             checkArrGlobal[offer.tradeId] = 0;
                         });
@@ -509,7 +511,6 @@ var queueProceed = function(){
     //Проверка принятия офферов
     redisClient.llen(redisChannels.checkOfferStateList,function (err,length) {
         if(length > 0  && WebSession) {
-            console.tag('SteamBotDuel','CheckOfferList').info('checkOfferList: ' + length);
             checkProcceed = true;
             for(var i = 0; i < length; i++)
                 redisClient.lindex(redisChannels.checkOfferStateList,i,function(err,offerJson){
