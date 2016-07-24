@@ -405,20 +405,6 @@ var sendTradeOffer = function(offerJson){
     });
     d.run(function(){
         var offer = JSON.parse(offerJson);
-        offers.loadPartnerInventory({
-            partnerSteamId: offer.partnerSteamId,
-            contextId: 2,
-            appId: 730
-        }, function (err, items) {
-            if(err) {
-                console.tag('SteamBotDuel', 'SendTrade').error('LoadPartnerInventory error!',err.message);
-                redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                    setReceiveStatus(offer.id, 3,[]);
-                    receiveProcceed = false;
-                });
-                return;
-            }
-
             var itemsFromPartner = [];
             offer.items.forEach(function(item){
                 console.log(item);
@@ -431,25 +417,6 @@ var sendTradeOffer = function(offerJson){
                     }
                 );
             });
-
-            /*offer.items.forEach(function (item) {
-                for(var i = 0; i<items.length; i++) {
-                    if (!items[i].ss && items[i].classid == item.classId) {
-                        items[i].ss = 1;
-                        console.log(items[i]);
-                        /*itemsFromPartner.push(
-                            {
-                                appid: 730,
-                                contextid: 2,
-                                amount: items[i].amount,
-                                assetid: items[i].id
-                            }
-                        );
-                        break;
-                    }
-                }
-            });*/
-
 
             if (itemsFromPartner.length > 0) {
                 offers.makeOffer({
@@ -502,7 +469,6 @@ var sendTradeOffer = function(offerJson){
                     });
                 });
             }
-        });
     });
 };
 
