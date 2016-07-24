@@ -203,6 +203,7 @@ var sendPrizeOffer = function(offerJson) {
             appId: 730,
             contextId: 2
         }, function (err, items) {
+            console.log('MakeOffer Items LENGTH:',items.length);
             if(err) {
                 console.tag('SteamBotDuel', 'SendTrade').error('LoadMyInventory error: ',err.message);
                 relogin();
@@ -211,28 +212,30 @@ var sendPrizeOffer = function(offerJson) {
             }
             var itemsFromMe = [];
             offer.items.forEach(function (item) {
+                itemsFromMe.push({
+                    appid: 730,
+                    contextid: 2,
+                    amount: 1,
+                    assetid: item.id
+                });
+                /*
                 for(var i=0; i < items.length; i++)
                 {
-                    if(!items[i].ss && items[i].id == item.id)
+                    if(items[i].id == item.id)
                     {
-                        items[i].ss = 1;
                         itemsFromMe.push({
                             appid: 730,
                             contextid: 2,
                             amount: items[i].amount,
                             assetid: items[i].id
                         });
-                        break;
+                        return;
                     }
-                }
+                }*/
             });
-            itemsFromMe.push({
-                appid: 730,
-                contextid: 2,
-                amount: 1,
-                assetid: 1234342
-            });
-
+            if(offer.items.length == itemsFromMe.length || offer.items.length-2 <= itemsFromMe.length) {
+                console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
+            }
             if (itemsFromMe.length > 0) {
                 offers.makeOffer({
                     partnerSteamId: offer.partnerSteamId,
