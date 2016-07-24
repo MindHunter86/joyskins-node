@@ -368,7 +368,6 @@ var checkOffer = function(offerJson){
                 if(unix-offer.time > 90)
                 {
                     offers.cancelOffer({tradeOfferId: offer.tradeId},function(err,res){
-                        console.log(res);
                         if(err){
                             console.tag('SteamBotDuel').error('timeout canceloffer error:',err.message);
                             checkArrGlobal[offer.tradeId] = 0;
@@ -407,7 +406,6 @@ var sendTradeOffer = function(offerJson){
         var offer = JSON.parse(offerJson);
             var itemsFromPartner = [];
             offer.items.forEach(function(item){
-                console.log(item);
                 itemsFromPartner.push(
                     {
                         appid: 730,
@@ -424,7 +422,7 @@ var sendTradeOffer = function(offerJson){
                     accessToken: offer.accessToken,
                     itemsFromMe: [],
                     itemsFromThem: itemsFromPartner,
-                    message: 'Создание/Вступление в комнату на: ' + config.domain
+                    message: 'Создание/Вступление номер ставки: ' + offer.id
                 }, function (err, response) {
                     if (err) {
                         console.tag('SteamBotDuel','SendTrade').error('MakeOffer error: ',err.message);
