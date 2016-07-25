@@ -182,8 +182,8 @@ function getErrorCode(err, callback){
 var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,timeout,callback) {
     if(count_retries > 0){
         offers.makeOffer({
-            partnerSteamId: partnerSteamID,
-            accessToken: accessToken,
+            partnerSteamId: partnerSteamID.toString(),
+            accessToken: accessToken.toString(),
             itemsFromMe: itemsFromMe,
             itemsFromThem: itemsFromThem,
             message: message
@@ -309,9 +309,9 @@ var sendPrizeOffer = function(offerJson) {
             var itemsFromMe = [];
             offer.items.forEach(function(item) {
                 itemsFromMe.push({
-                    appid: 730,
-                    contextid: 2,
-                    amount: 1,
+                    appid: '730',
+                    contextid: '2',
+                    amount: '1',
                     assetid: item.id.toString()
                 });
             });
