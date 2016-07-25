@@ -315,6 +315,7 @@ var sendPrizeOffer = function(offerJson) {
                     assetid: item.id.toString()
                 });
             });
+            console.log(offer);
             send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,5,
                 function(err,tradeId) {
                     if(err){
