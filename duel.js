@@ -515,7 +515,7 @@ var sendTradeOffer = function(offerJson){
 var queueProceed = function(){
     //Выдача выигрыша
     redisClient.llen(redisChannels.sendWinnerPrizeList, function(err, length) {
-        if (length > 0 && !sendWinnerProcceed && WebSession) {
+        if (length > 0 && WebSession) {
             console.tag('SteamBotDuel','SendWinnerProcceed').info('SendWinnerList:' + length);
             sendWinnerProcceed = true;
             for(var i = 0;i<length;i++)
