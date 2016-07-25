@@ -143,7 +143,7 @@ steamUser.on('tradeOffers', function(number) {
     }
 });
 
-var checkArrGlobal = {};
+var checkArrGlobal = {},  checkArrPrize = {};
 
 function relogin() {
     steamFriends.setPersonaState(Steam.EPersonaState.Online);
@@ -179,6 +179,34 @@ function getErrorCode(err, callback){
     callback(errCode);
 }
 
+var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback) {
+    offers.makeOffer({
+        partnerSteamId: partnerSteamId,
+        accessToken: accessToken,
+        itemsFromMe: itemsFromMe,
+        itemsFromThem: itemsFromThem,
+        message: message
+    },function(err,response){
+        if(err){
+            getErrorCode(err.message,function(errCode){
+                if(errCode == 20 || errCode == 28) {
+                    steamBotLogger('Received 20 or 28 errCode try again');
+                    setTimeout(send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback),5000);
+                    return;
+                } else if (errCode == 26 || errCode == 15 || errCode == 25){
+                    callback(err);
+                } else {
+                    console.tag('send_trade_offer').error(err.stack,'Try AGAIN 15 sec');
+                    setTimeout(send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback),15000);
+                    return;
+                }
+            });
+            return;
+        }
+        return callback(null,response.tradeofferid);
+    });
+};
+
 var setPrizeStatus = function(item, status){
     requestify.post(config.protocol+config.domain+'/api/duel/setPrizeStatus', {
             secretKey: config.secretKey,
@@ -194,32 +222,30 @@ var setPrizeStatus = function(item, status){
 };
 var sendPrizeOffer = function(offerJson) {
     var d = domain.create();
+    var offer = JSON.parse(offerJson);
+    if(checkArrPrize[offer.id])
+        return;
+    checkArrPrize[offer.id] = true;
     d.on('error', function(err) {
         console.tag('SteamBotDuel').error('Error to send prize offer',err.message);
-        sendWinnerProcceed = false;
+        checkArrPrize[offer.id] = false;
     });
-    var offer = JSON.parse(offerJson);
     d.run(function () {
-        offers.loadMyInventory({
-            appId: 730,
-            contextId: 2
-        }, function (err, items) {
-            if(err) {
-                console.tag('SteamBotDuel', 'SendTrade').error('LoadMyInventory error: ',err.message);
-                relogin();
-                sendWinnerProcceed = false;
-                return;
-            }
-            var itemsFromMe = [];
-            offer.items.forEach(function (item) {
-                if(!offer.typeSend) {
-                    itemsFromMe.push({
-                        appid: 730,
-                        contextid: 2,
-                        amount: 1,
-                        assetid: item.id
-                    });
-                } else {
+        if(offer.typeSend) {
+            steamBotLogger('SendWinnerPrize with checking inventory:'+offer.id)
+            offers.loadMyInventory({
+                appId: 730,
+                contextId: 2
+            }, function (err, items) {
+                if(err) {
+                    console.tag('SteamBotDuel', 'SendTrade').error('LoadMyInventory error: ',err.message);
+                    WebSession = false;
+                    relogin();
+                    checkArrPrize[offer.id] = false;
+                    return;
+                }
+                var itemsFromMe = [];
+                offer.items.forEach(function (item) {
                     for(var i=0; i < items.length; i++)
                     {
                         if(items[i].id == item.id)
@@ -233,65 +259,67 @@ var sendPrizeOffer = function(offerJson) {
                             return;
                         }
                     }
-                }
-            });
-            console.log(offer.partnerSteamId,offer.accessToken);
-            if(offer.items.length > itemsFromMe.length+2 && offer.typeSend) {
-                console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
-                if(sendTradeRetries > 5) {
-                    redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                        setPrizeStatus(offer.id, 2);
-                        sendWinnerProcceed = false;
-                    });
-                    return;
-                } else {
-                    sendTradeRetries++;
-                    sendWinnerProcceed = false;
-                    return;
-                }
-            }
-            if (itemsFromMe.length > 0) {
-                offers.makeOffer({
-                    partnerSteamId: offer.partnerSteamId,
-                    accessToken: offer.accessToken,
-                    itemsFromMe: itemsFromMe,
-                    itemsFromThem: [],
-                    message: 'Поздравляем с победой в раунде:  ' + offer.id
-                    }, function (err, response) {
-                        if (err) {
-                            console.tag('SteamBotDuel').error('offer.id :',offer.id,err.message);
-                            getErrorCode(err.message, function (errCode) {
-                                if (errCode == 28 || errCode == 20)
-                                {
-                                    sendWinnerProcceed = false;
-                                    return;
-                                }
-                                if (errCode == 15 || errCode == 25 || err.message.indexOf('an error sending your trade offer.  Please try again later.')) {
-                                    redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
-                                        setPrizeStatus(offer.id, 2);
-                                        sendWinnerProcceed = false;
-                                    });
-                                }
-                            });
-                            sendWinnerProcceed = false;
-                            return;
-                        }
+                });
+                if(offer.items.length > itemsFromMe.length+2 && offer.typeSend) {
+                    console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
+                    if(sendTradeRetries > 5) {
                         redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                            setPrizeStatus(offer.id, 2);
                             sendWinnerProcceed = false;
-                            setPrizeStatus(offer.id, 1);
-                            console.tag('SteamBotDuel', 'sendPrize').log('TradeOffer #' + response.tradeofferid + ' send!');
                         });
-                    });
+                        return;
+                    } else {
+                        sendTradeRetries++;
+                        checkArrPrize[offer.id] = false;
+                        return;
+                    }
+                }
+                if (itemsFromMe.length > 0) {
+                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,0,
+                        function(err,tradeId) {
+                            if(err){
+                                console.tag('sendPrize','SteamBotDuel').error(err.stack);
+                                redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                                    setPrizeStatus(offer.id, 2);
+                                    checkArrPrize[offer.id] = false;
+                                });
+                            } else {
+                                redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                                    setPrizeStatus(offer.id, 1);
+                                    console.tag('SteamBotDuel', 'sendPrize').log('TradeOffer #' + tradeId + ' send!');
+                                    checkArrPrize[offer.id] = false;
+                                });
+                            }
+                        }
+                    );
                 } else {
                     redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
                         console.tag('SteamBotDuel', 'sendPrize').log('Items not found!');
                         setPrizeStatus(offer.id, 2);
-                        sendWinnerProcceed = false;
+                        checkArrPrize[offer.id] = false;
                     });
                 }
-
-        });
-
+            });
+        } else {
+            steamBotLogger('sendPrizeOffer:'+offer.id);
+            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,0,
+                function(err,tradeId) {
+                    if(err){
+                        console.tag('sendPrize','SteamBotDuel').error(err.stack);
+                        redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                            setPrizeStatus(offer.id, 2);
+                            checkArrPrize[offer.id] = false;
+                        });
+                    } else {
+                        redisClient.lrem(redisChannels.sendWinnerPrizeList, 0, offerJson, function (err, data) {
+                            setPrizeStatus(offer.id, 1);
+                            console.tag('SteamBotDuel', 'sendPrize').log('TradeOffer #' + tradeId + ' send!');
+                            checkArrPrize[offer.id] = false;
+                        });
+                    }
+                }
+            );
+        }
     });
 };
 
@@ -476,9 +504,10 @@ var queueProceed = function(){
         if (length > 0 && !sendWinnerProcceed && WebSession) {
             console.tag('SteamBotDuel','SendWinnerProcceed').info('SendWinnerList:' + length);
             sendWinnerProcceed = true;
-            redisClient.lindex(redisChannels.sendWinnerPrizeList, 0,function (err, offerJson) {
-                sendPrizeOffer(offerJson);
-            });
+            for(var i = 0;i<length;i++)
+                redisClient.lindex(redisChannels.sendWinnerPrizeList, i,function (err, offerJson) {
+                    sendPrizeOffer(offerJson);
+                });
         }
     });
     //Отправка предметов на вход в игру.
