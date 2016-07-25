@@ -279,7 +279,7 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
                 if (itemsFromMe.length > 0) {
-                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,
+                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,1,
                         function(err,tradeId) {
                             if(err){
                                 console.tag('sendPrize','SteamBotDuel').error(err.stack);
@@ -316,7 +316,7 @@ var sendPrizeOffer = function(offerJson) {
                 return;
             });
             steamBotLogger('sendPrizeOffer:'+offer.id);
-            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,
+            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,1,
                 function(err,tradeId) {
                     if(err){
                         console.tag('sendPrize','SteamBotDuel').error(err.stack);
