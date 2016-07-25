@@ -181,7 +181,7 @@ function getErrorCode(err, callback){
 
 var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback) {
     offers.makeOffer({
-        partnerSteamId: partnerSteamId,
+        partnerSteamId: partnerSteamID,
         accessToken: accessToken,
         itemsFromMe: itemsFromMe,
         itemsFromThem: itemsFromThem,
