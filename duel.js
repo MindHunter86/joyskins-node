@@ -179,7 +179,7 @@ function getErrorCode(err, callback){
     callback(errCode);
 }
 
-var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,timeout,callback) {
+var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,optional_id,count_retries,timeout,callback) {
     if(count_retries > 0){
         offers.makeOffer({
             partnerSteamId: partnerSteamID.toString(),
@@ -191,14 +191,14 @@ var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFrom
             if(err){
                 getErrorCode(err.message,function(errCode){
                     if(errCode == 20 || errCode == 28) {
-                        steamBotLogger('Received 20 or 28 errCode try again');
-                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,timeout,callback)},timeout);
+                        console.tag('send_trade_offer','id:'+optional_id).error('Received 20 or 28 errCode try again');
+                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,optional_id,count_retries,timeout,callback)},timeout);
                         return;
                     } else if (errCode == 26 || errCode == 15 || errCode == 25){
                         callback(err);
                     } else {
-                        console.tag('send_trade_offer').error(err.message,'Try AGAIN 15 sec');
-                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,--count_retries,timeout*1.5,callback)},timeout*1.5);
+                        console.tag('send_trade_offer','id:'+optional_id).error(err.message,'Try AGAIN 15 sec');
+                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,optional_id,--count_retries,timeout*1.5,callback)},timeout*1.5);
                         return;
                     }
                 });
@@ -279,7 +279,7 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
                 if (itemsFromMe.length > 0) {
-                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,5,
+                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,offer.id,5,5,
                         function(err,tradeId) {
                             if(err){
                                 console.tag('sendPrize','SteamBotDuel').error(err.message);
@@ -315,7 +315,7 @@ var sendPrizeOffer = function(offerJson) {
                     assetid: item.id.toString()
                 });
             });
-            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,5,
+            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,offer.id,5,5,
                 function(err,tradeId) {
                     if(err){
                         console.tag('sendPrize','SteamBotDuel').error(err.stack);
@@ -462,7 +462,7 @@ var sendTradeOffer = function(offerJson){
             });
 
             if (itemsFromPartner.length > 0) {
-                send_trade_offer(offer.partnerSteamId,offer.accessToken,[],itemsFromPartner,'Создание/Вступление номер ставки: ' + offer.id,5,1,function(err,tradeId){
+                send_trade_offer(offer.partnerSteamId,offer.accessToken,[],itemsFromPartner,'Создание/Вступление номер ставки: ' + offer.id+' hash(дуэли): '+offer.hash,offer.id,5,1,function(err,tradeId){
                     if(err){
                         redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
                             console.tag('SteamBotDuel','receiveOffer').error('Error receive offer: ',offer.id,':',err.message);
