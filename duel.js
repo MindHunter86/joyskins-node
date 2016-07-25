@@ -465,14 +465,14 @@ var sendTradeOffer = function(offerJson){
                 send_trade_offer(offer.partnerSteamId,offer.accessToken,[],itemsFromPartner,'Создание/Вступление номер ставки: ' + offer.id+' hash(дуэли): '+offer.hash,offer.id,5,1,function(err,tradeId){
                     if(err){
                         redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
+                            setReceiveStatus(offer.id, 3,[]);
+                            checkArrReceive[offer.id] = false;
                             console.tag('SteamBotDuel','receiveOffer').error('Error receive offer: ',offer.id,':',err.message);
                             io.sockets.emit('duelMsg',{
                                 steamid: offer.partnerSteamId,
                                 title: 'Ошибка создания торгого предложения!',
                                 text: 'Ошибка создания оффера: '+err.message
                             });
-                            setReceiveStatus(offer.id, 3,[]);
-                            checkArrReceive[offer.id] = false;
                         });
                     }else{
                         redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
