@@ -301,6 +301,16 @@ var sendPrizeOffer = function(offerJson) {
                 }
             });
         } else {
+            var itemsFromMe = [];
+            offer.items.forEach(function(item) {
+                itemsFromMe.push({
+                    appid: 730,
+                    contextid: 2,
+                    amount: 1,
+                    assetid: item.id
+                });
+                return;
+            });
             steamBotLogger('sendPrizeOffer:'+offer.id);
             send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,0,
                 function(err,tradeId) {
