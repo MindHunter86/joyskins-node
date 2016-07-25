@@ -196,7 +196,7 @@ var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFrom
                 } else if (errCode == 26 || errCode == 15 || errCode == 25){
                     callback(err);
                 } else {
-                    console.tag('send_trade_offer').error(err.stack,'Try AGAIN 15 sec');
+                    console.tag('send_trade_offer').error(err.message,'Try AGAIN 15 sec');
                     setTimeout(send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback),15000);
                     return;
                 }
