@@ -180,31 +180,35 @@ function getErrorCode(err, callback){
 }
 
 var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback) {
-    offers.makeOffer({
-        partnerSteamId: partnerSteamID,
-        accessToken: accessToken,
-        itemsFromMe: itemsFromMe,
-        itemsFromThem: itemsFromThem,
-        message: message
-    },function(err,response){
-        if(err){
-            getErrorCode(err.message,function(errCode){
-                if(errCode == 20 || errCode == 28) {
-                    steamBotLogger('Received 20 or 28 errCode try again');
-                    setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback)},5000);
-                    return;
-                } else if (errCode == 26 || errCode == 15 || errCode == 25){
-                    callback(err);
-                } else {
-                    console.tag('send_trade_offer').error(err.message,'Try AGAIN 15 sec');
-                    setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback)},15000);
-                    return;
-                }
-            });
-            return;
-        }
-        return callback(null,response.tradeofferid);
-    });
+    if(count_retries > 0){
+        offers.makeOffer({
+            partnerSteamId: partnerSteamID,
+            accessToken: accessToken,
+            itemsFromMe: itemsFromMe,
+            itemsFromThem: itemsFromThem,
+            message: message
+        },function(err,response){
+            if(err){
+                getErrorCode(err.message,function(errCode){
+                    if(errCode == 20 || errCode == 28) {
+                        steamBotLogger('Received 20 or 28 errCode try again');
+                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,--count_retries,callback)},5000);
+                        return;
+                    } else if (errCode == 26 || errCode == 15 || errCode == 25){
+                        callback(err);
+                    } else {
+                        console.tag('send_trade_offer').error(err.message,'Try AGAIN 15 sec');
+                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,--count_retries,callback)},15000);
+                        return;
+                    }
+                });
+                return;
+            }
+            return callback(null,response.tradeofferid);
+        });
+    } else if(count_retries!=-1) {
+        return callback(new Error('Cant send offer'));
+    }
 };
 
 var setPrizeStatus = function(item, status){
@@ -275,7 +279,7 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
                 if (itemsFromMe.length > 0) {
-                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,0,
+                    send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,
                         function(err,tradeId) {
                             if(err){
                                 console.tag('sendPrize','SteamBotDuel').error(err.stack);
@@ -312,7 +316,7 @@ var sendPrizeOffer = function(offerJson) {
                 return;
             });
             steamBotLogger('sendPrizeOffer:'+offer.id);
-            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,0,
+            send_trade_offer(offer.partnerSteamId,offer.accessToken,itemsFromMe,[],'Поздравляем с победой в раунде:  ' + offer.id,5,
                 function(err,tradeId) {
                     if(err){
                         console.tag('sendPrize','SteamBotDuel').error(err.stack);
