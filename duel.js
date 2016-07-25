@@ -191,13 +191,13 @@ var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFrom
             getErrorCode(err.message,function(errCode){
                 if(errCode == 20 || errCode == 28) {
                     steamBotLogger('Received 20 or 28 errCode try again');
-                    setTimeout(send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback),5000);
+                    setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback)},5000);
                     return;
                 } else if (errCode == 26 || errCode == 15 || errCode == 25){
                     callback(err);
                 } else {
                     console.tag('send_trade_offer').error(err.message,'Try AGAIN 15 sec');
-                    setTimeout(send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback),15000);
+                    setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,callback)},15000);
                     return;
                 }
             });
