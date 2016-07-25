@@ -227,7 +227,7 @@ var sendPrizeOffer = function(offerJson) {
         return;
     checkArrPrize[offer.id] = true;
     d.on('error', function(err) {
-        console.tag('SteamBotDuel').error('Error to send prize offer',err.message);
+        console.tag('SteamBotDuel').error('Error to send prize offer',err.stack);
         checkArrPrize[offer.id] = false;
     });
     d.run(function () {
