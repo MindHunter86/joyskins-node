@@ -192,7 +192,7 @@ var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFrom
                 getErrorCode(err.message,function(errCode){
                     if(errCode == 20 || errCode == 28) {
                         steamBotLogger('Received 20 or 28 errCode try again');
-                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,--count_retries,timeout,callback)},timeout);
+                        setTimeout(function(){send_trade_offer(partnerSteamID,accessToken,itemsFromMe,itemsFromThem,message,count_retries,timeout,callback)},timeout);
                         return;
                     } else if (errCode == 26 || errCode == 15 || errCode == 25){
                         callback(err);
