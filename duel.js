@@ -227,7 +227,7 @@ var setPrizeStatus = function(item, status){
 var sendPrizeOffer = function(offerJson) {
     var d = domain.create();
     var offer = JSON.parse(offerJson);
-    if(checkArrPrize[offer.id])
+    if(checkArrPrize[offer.id] === true)
         return;
     checkArrPrize[offer.id] = true;
     d.on('error', function(err) {
