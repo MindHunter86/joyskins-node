@@ -235,7 +235,7 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
             });
-            console.log(itemsFromMe);
+            console.log(offer.partnerSteamId,offer.accessToken);
             if(offer.items.length > itemsFromMe.length+2 && offer.typeSend) {
                 console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
                 if(sendTradeRetries > 5) {
