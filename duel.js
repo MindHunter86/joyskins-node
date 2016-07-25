@@ -235,6 +235,7 @@ var sendPrizeOffer = function(offerJson) {
                     }
                 }
             });
+            console.log(itemsFromMe);
             if(offer.items.length > itemsFromMe.length+2 && offer.typeSend) {
                 console.tag('SteamBotDuel','SendTrade').error('Items ERROR try again');
                 if(sendTradeRetries > 5) {
@@ -508,7 +509,7 @@ var queueProceed = function(){
 var receiveProcceed = false;
 var sendWinnerProcceed = false;
 var checkProcceed = false;
-setInterval(queueProceed, 3000);
+setInterval(queueProceed, 1500);
 function str_replace ( search, replace, subject ) {
     if(!(replace instanceof Array)){
         replace=new Array(replace);
