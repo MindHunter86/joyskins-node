@@ -14,7 +14,7 @@ var auth = require('http-auth'),
 
 var redisClient = redis.createClient(config.redisPort,config.redisIp),
     client = redis.createClient(config.redisPort,config.redisIp);
-var chat = {};
+var chat = [];
 bot.init(redis, io, requestify);
 shop.init(redis, requestify);
 duel.init(redis, io, requestify);
