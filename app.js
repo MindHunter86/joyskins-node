@@ -40,9 +40,14 @@ redisClient.subscribe(config.prefix + 'newRoom');
 redisClient.subscribe(config.prefix + 'newJoin');
 redisClient.subscribe(config.prefix + 'show.duel.winner');
 redisClient.subscribe(config.prefix + 'pre.finish.duel');
+redisClient.subscribe(config.prefix + 'chat.message');
+redisClient.subscribe(config.prefix + 'delete.chat.message');
 
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
+    if(channel == 'chat.message' || channel == 'delete.chat.message') {
+        io.sockets.emit(channel,message);
+    }
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
         io.sockets.emit(channel, message);
     }
