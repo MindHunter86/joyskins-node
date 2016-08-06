@@ -107,9 +107,8 @@ redisClient.on("message", function(channel, message) {
 });
 
 io.sockets.on('connection', function(socket) {
-    chat.forEach(function (msg) {
-       socket.emit('chat.message',msg);
-    });
+   for(var i=0; i < chat.length; i++)
+       socket.emit('chat.message',chat[i]);
     updateOnline();
     socket.on('disconnect', function(){
         updateOnline();
