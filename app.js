@@ -14,7 +14,7 @@ var auth = require('http-auth'),
 
 var redisClient = redis.createClient(config.redisPort,config.redisIp),
     client = redis.createClient(config.redisPort,config.redisIp);
-
+var chat = {};
 bot.init(redis, io, requestify);
 shop.init(redis, requestify);
 duel.init(redis, io, requestify);
@@ -46,6 +46,10 @@ redisClient.subscribe(config.prefix + 'delete.chat.message');
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
     if(channel == 'chat.message' || channel == 'delete.chat.message') {
+        if(chat.length > 25) {
+            chat.splice(0,1);
+        }
+        chat.push(message);
         io.sockets.emit(channel,message);
     }
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
@@ -103,7 +107,9 @@ redisClient.on("message", function(channel, message) {
 });
 
 io.sockets.on('connection', function(socket) {
-
+    chat.forEach(function (msg) {
+       socket.emit('chat.message',msg);
+    });
     updateOnline();
     socket.on('disconnect', function(){
         updateOnline();
