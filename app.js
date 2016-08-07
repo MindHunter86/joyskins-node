@@ -14,7 +14,7 @@ var auth = require('http-auth'),
 
 var redisClient = redis.createClient(config.redisPort,config.redisIp),
     client = redis.createClient(config.redisPort,config.redisIp);
-
+var chat = [];
 bot.init(redis, io, requestify);
 shop.init(redis, requestify);
 duel.init(redis, io, requestify);
@@ -40,9 +40,26 @@ redisClient.subscribe(config.prefix + 'newRoom');
 redisClient.subscribe(config.prefix + 'newJoin');
 redisClient.subscribe(config.prefix + 'show.duel.winner');
 redisClient.subscribe(config.prefix + 'pre.finish.duel');
+redisClient.subscribe(config.prefix + 'chat.message');
+redisClient.subscribe(config.prefix + 'delete.chat.message');
 
 redisClient.setMaxListeners(0);
 redisClient.on("message", function(channel, message) {
+    if(channel == 'chat.message' ) {
+        if(chat.length > 25) {
+            chat.splice(0,1);
+        }
+        chat.push(message);
+        io.sockets.emit(channel,message);
+    }
+    if(channel == 'delete.chat.message') {
+        for(var i=0; i < chat.length; i++) {
+            if(JSON.parse(chat[i]).key == message) {
+                chat.splice(i,1);
+            }
+        }
+        io.sockets.emit(channel,message);
+    }
     if(channel == config.prefix + 'depositDecline' || channel == config.prefix + 'queue'){
         io.sockets.emit(channel, message);
     }
@@ -98,7 +115,8 @@ redisClient.on("message", function(channel, message) {
 });
 
 io.sockets.on('connection', function(socket) {
-
+   for(var i=0; i < chat.length; i++)
+       socket.emit('chat.message',chat[i]);
     updateOnline();
     socket.on('disconnect', function(){
         updateOnline();
