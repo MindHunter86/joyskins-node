@@ -203,8 +203,8 @@ var send_trade_offer = function(partnerSteamID,accessToken,itemsFromMe,itemsFrom
                     }
                 });
                 return;
-            }
-            return callback(null,response.tradeofferid);
+            } else
+                return callback(null,response.tradeofferid);
         });
     } else if(count_retries!=-1) {
         return callback(new Error('Cant send offer'));
@@ -372,13 +372,12 @@ var checkOffer = function(offerJson){
                         console.tag('SteamDuelBot','CheckOffer').error('Error getItems: ',err.message);
                         checkArrGlobal[offer.tradeId] = 0;
                         return;
-                    }
-                    if(items.length == 0)
+                    } else if(items.length == 0)
                     {
                         console.tag('SteamDuelBot','CheckOffer').error('GetItems LAG');
                         checkArrGlobal[offer.tradeId] = 0;
                         return
-                    }
+                    } else
                     redisClient.lrem(redisChannels.checkOfferStateList,0,offerJson,function (err,data) {
                         var acceptedItems = [];
                         steamBotLogger('BetId:'+offer.betId+':accepted');
@@ -464,7 +463,7 @@ var sendTradeOffer = function(offerJson){
             if (itemsFromPartner.length > 0) {
                 send_trade_offer(offer.partnerSteamId,offer.accessToken,[],itemsFromPartner,'Создание/Вступление номер ставки: ' + offer.id+' hash(дуэли): '+offer.hash,offer.id,5,1,function(err,tradeId){
                     if(err){
-                        redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err, data) {
+                        redisClient.lrem(redisChannels.receiveBetItems, 0, offerJson, function (err1, data) {
                             setReceiveStatus(offer.id, 3,[]);
                             checkArrReceive[offer.id] = false;
                             console.tag('SteamBotDuel','receiveOffer').error('Error receive offer: ',offer.id,':',err.message);
