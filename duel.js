@@ -482,6 +482,8 @@ var sendTradeOffer = function(offerJson){
                             redisClient.rpush(redisChannels.checkOfferStateList,JSON.stringify({tradeId:tradeId,betId: offer.id,time: unix}));
                             io.sockets.emit('duelMsg',{steamid: offer.partnerSteamId,title: 'Оффер отправлен успешно!',text: 'Предложение успешно отправлено, примите оффер: <a target="_blank" href="https://steamcommunity.com/tradeoffer/' + tradeId + '/"><b>Принять</b></a>'});
                         });
+                        redisClient.set('duel_bet_to_'+offer.id,tradeId);
+                        redisClient.expireat('duel_bet_to_'+offer.id, parseInt((+new Date)/1000) + 86400);
                     }
                 });
             } else {
